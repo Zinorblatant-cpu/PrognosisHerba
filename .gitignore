@@ -39,3 +39,7 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# Claude Code context (não faz parte do entregável do projeto)
+CLAUDE.md
+AGENTS.md
