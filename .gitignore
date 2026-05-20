@@ -40,6 +40,3 @@ yarn-error.*
 /ios
 /android
 
-# Claude Code context (não faz parte do entregável do projeto)
-CLAUDE.md
-AGENTS.md
