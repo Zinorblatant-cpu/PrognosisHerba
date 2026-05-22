@@ -275,17 +275,7 @@ npm test
 Adicionar link do Figma aqui:
 
 ```txt
-https://figma.com/SEU-LINK
-```
-
----
-
-# 🔗 Repositório GitHub
-
-Adicionar link do GitHub aqui:
-
-```txt
-https://github.com/seu-repositorio
+https://www.figma.com/design/U65XJovakZgKdhKiMNkwNe/PrognosisHerba?node-id=0-1&t=kPh46l4wXuSrPu0r-0
 ```
 
 ---
