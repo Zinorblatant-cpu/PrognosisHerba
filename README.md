@@ -1,131 +1,310 @@
-# PrognosisHerba
+# PrognosisHerba 🌿
 
-App mobile para gestão e monitoramento de atividades de poda de vegetação nas rodovias concedidas da **CCR Motiva**, desenvolvido como solução para o **Challenge CCR Motiva — Sprint 1**.
-
----
-
-## Integrantes
-
-| Nome | RM |
-|------|----|
-| Lucas Ferrari Lima | 563119 |
-| Carlos Eduardo Pires Cervelli | 563462 |
-| Felipe Krzyzanovski dos Santos Menezes | 564878 |
-| Leonardo Lopes Oliveira | 565437 |
-| Arthur de Souza Matos Dias | 566068 |
-| Guilherme Carreri Giampietro | 565676 |
-| Mateus Patrício Pereira | 564695 |
+Aplicativo mobile desenvolvido para o **Challenge CCR Motiva — Sprint 1**, com foco no monitoramento, planejamento e gestão de vegetação em rodovias concedidas.
 
 ---
 
-## Problema Escolhido
+# 📖 Sobre o Projeto
 
-As equipes de conservação da Motiva realizam atividades de poda de vegetação nas rodovias de forma frequente, mas o acompanhamento dessas atividades é fragmentado: operadores de campo não têm visibilidade clara das tarefas do dia, supervisores não conseguem acompanhar em tempo real o cumprimento das obrigações regulatórias (ARTESP/ANTT), e não há um canal único para registro e consulta das atividades programadas.
+O **PrognosisHerba** foi criado para auxiliar operadores de campo, supervisores e gestores responsáveis pela conservação de rodovias da Motiva.
 
-O recorte escolhido: **dar ao operador de campo uma ferramenta mobile que concentre suas atividades de poda do dia e da semana**, reduzindo retrabalho de comunicação e aumentando a rastreabilidade das operações.
+A solução busca otimizar o processo de monitoramento e planejamento de podas e manutenção da vegetação, ajudando equipes operacionais a registrarem atividades de campo, acompanharem cronogramas e organizarem intervenções com mais eficiência.
 
----
-
-## Persona
-
-**João Silva — Operador de Campo**
-
-- 34 anos, trabalha na frente de conservação da Motiva há 6 anos
-- Acessa informações via smartphone Android durante o expediente
-- Precisa saber quais trechos deve podar, em qual horário e quantos dias tem pela frente
-- Sofre com informações chegando por WhatsApp, e-mail e planilha sem integração
-- Objetivo: chegar na rodovia já sabendo exatamente o que fazer, sem precisar ligar para o supervisor
-
-> Persona completa e requisitos detalhados: [REQUISITOS.md](./REQUISITOS.md)
+O projeto foi desenvolvido considerando o contexto operacional apresentado pela CCR Motiva, incluindo:
+- Conservação de rodovias;
+- Gestão de equipes de poda;
+- Necessidades operacionais de campo;
+- Controle de atividades semanais;
+- Organização de informações operacionais.
 
 ---
 
-## Proposta de Solução
+# 🎯 Problema Escolhido
 
-O **PrognosisHerba** é um app mobile que permite ao operador de campo:
-
-1. **Registrar-se e fazer login** com persistência de sessão (fica logado mesmo ao fechar o app)
-2. **Visualizar as atividades do dia** — quais trechos têm poda programada e quais não têm
-3. **Consultar a agenda semanal** — quantos dias de poda, locais definidos e horários
-4. **Ver um resumo rápido** da semana com dias de poda, número de locais e horário de início
-5. **Fazer logout** a qualquer momento com limpeza segura da sessão
+Atualmente, equipes responsáveis pela conservação vegetal em rodovias enfrentam dificuldades relacionadas a:
+- Organização manual das atividades;
+- Falta de centralização das informações;
+- Dificuldade no acompanhamento das podas programadas;
+- Comunicação operacional pouco eficiente;
+- Necessidade de maior controle das atividades executadas em campo.
 
 ---
 
-## Stack Tecnológica e Justificativa
+# 💡 Proposta da Solução
 
-| Tecnologia | Versão | Justificativa |
+O **PrognosisHerba** propõe uma solução mobile para:
+- Planejar atividades de poda;
+- Visualizar tarefas diárias e semanais;
+- Organizar cronogramas operacionais;
+- Facilitar o acompanhamento das equipes;
+- Centralizar informações operacionais em um único sistema.
+
+A aplicação possui um fluxo simples e intuitivo para facilitar o uso em campo.
+
+---
+
+# 👤 Persona Principal
+
+## Nome:
+Carlos Henrique
+
+## Idade:
+38 anos
+
+## Cargo:
+Supervisor de Conservação Rodoviária
+
+## Objetivos:
+- Organizar equipes de poda;
+- Monitorar atividades programadas;
+- Melhorar o controle operacional;
+- Garantir maior eficiência na conservação das rodovias.
+
+## Dores:
+- Falta de padronização dos registros;
+- Controle operacional descentralizado;
+- Dificuldade de acompanhamento em tempo real;
+- Alto volume de atividades manuais.
+
+---
+
+# 🛠️ Stack Tecnológica
+
+| Tecnologia | Versão | Finalidade |
 |---|---|---|
-| **React Native** | 0.81.5 | Framework cross-platform amplamente adotado; único codebase para Android e iOS, reduzindo custo de manutenção |
-| **Expo SDK** | 54 | Abstrai configurações nativas complexas; acelera o ciclo de desenvolvimento com hot reload e build simplificado |
-| **React Navigation** | 7 (native-stack) | Navegação nativa com performance equivalente a uma navegação 100% nativa |
-| **AsyncStorage** | 2.2.0 | Persistência local leve e assíncrona; mantém a sessão do usuário entre sessões sem necessidade de backend |
-| **Jest + jest-expo** | 29 / 55 | Suite de testes com preset Expo; garante cobertura via TDD — testes escritos antes da implementação |
-| **@testing-library/react-native** | 13 | Testes orientados ao comportamento do usuário, não à implementação interna dos componentes |
-
-**Por que React Native + Expo?** O operador de campo usa Android. A Motiva pode precisar estender o app para iOS em supervisores. O Expo permite entregar nas duas plataformas com um único time sem duplicar o código.
-
----
-
-## Protótipo no Figma
-
-> 🔗 _[(inserir link do protótipo Figma com permissão de visualização ativa)](https://www.figma.com/design/U65XJovakZgKdhKiMNkwNe/PrognosisHerba?node-id=0-1&t=tej6hlv1yH7muMyN-1)_
+| React Native | 0.81.5 | Desenvolvimento mobile cross-platform |
+| Expo | ~54.0.33 | Ambiente de desenvolvimento e build |
+| React Navigation | ^7 | Navegação entre telas |
+| AsyncStorage | 2.2.0 | Persistência local de sessão |
+| Jest | ^29 | Testes automatizados |
+| jest-expo | ^55 | Integração de testes com Expo |
+| Testing Library | ^13 | Testes de componentes |
 
 ---
 
-## Estrutura do Projeto
+# ✅ Justificativa da Stack
 
+### React Native
+Permite desenvolvimento multiplataforma com alta produtividade e reutilização de código.
+
+### Expo
+Facilita configuração, testes e execução do projeto durante o desenvolvimento acadêmico.
+
+### React Navigation
+Estrutura a navegação entre telas de forma organizada e escalável.
+
+### AsyncStorage
+Permite persistência local de sessão sem necessidade de backend nesta Sprint.
+
+### Jest + Testing Library
+Garantem qualidade, previsibilidade e cobertura de testes utilizando abordagem TDD.
+
+---
+
+# 📱 Fluxo da Aplicação
+
+```txt
+Usuário não autenticado
+    ↓
+Tela de Cadastro
+    ↓
+Tela de Login
+    ↓
+Dashboard Principal
+    ↓
+Visualização das atividades
+    ↓
+Logout
 ```
+
+---
+
+# 🖥️ Telas Implementadas
+
+## RegisterScreen
+Tela responsável pelo cadastro de usuários.
+
+### Funcionalidades:
+- Cadastro com email e senha;
+- Validação de email;
+- Confirmação de senha;
+- Navegação para login.
+
+---
+
+## LoginScreen
+Tela responsável pela autenticação do usuário.
+
+### Funcionalidades:
+- Login com email e senha;
+- Persistência de sessão;
+- Navegação automática para dashboard.
+
+---
+
+## DashboardScreen
+Tela principal do sistema.
+
+### Funcionalidades:
+- Visualização das atividades do dia;
+- Visualização do cronograma semanal;
+- Resumo operacional;
+- Logout da aplicação.
+
+---
+
+# 📂 Estrutura do Projeto
+
+```txt
 PrognosisHerba/
-├── __tests__/              # Testes escritos antes da implementação (TDD)
-│   ├── RegisterScreen.test.js
-│   ├── LoginScreen.test.js
-│   ├── DashboardScreen.test.js
-│   ├── AuthService.test.js
-│   └── AppNavigation.test.js
+├── App.js
+├── index.js
+├── app.json
+├── assets/
 ├── src/
-│   ├── screens/
-│   │   ├── RegisterScreen.js
-│   │   ├── LoginScreen.js
-│   │   └── DashboardScreen.js
 │   ├── components/
-│   │   └── AppLogo.js
+│   ├── screens/
 │   ├── services/
-│   │   └── AuthService.js      # Persistência de sessão via AsyncStorage
 │   └── theme/
-│       └── colors.js
-├── App.js                      # Navegação + verificação de sessão na inicialização
-├── REQUISITOS.md               # RF, RNF, persona detalhada e restrições técnicas
-└── package.json
+└── __tests__/
 ```
 
 ---
 
-## Como Executar
+# 🧪 Testes
+
+O projeto utiliza abordagem **TDD (Test Driven Development)**.
+
+## Cobertura atual:
+- Navegação;
+- Login;
+- Cadastro;
+- Dashboard;
+- Persistência de sessão.
+
+## Total:
+✅ 41 testes passando.
+
+---
+
+# 🔒 Requisitos Funcionais (RF)
+
+| Código | Requisito |
+|---|---|
+| RF01 | O usuário deve conseguir realizar cadastro |
+| RF02 | O usuário deve conseguir realizar login |
+| RF03 | O sistema deve validar email |
+| RF04 | O sistema deve validar confirmação de senha |
+| RF05 | O sistema deve persistir sessão |
+| RF06 | O usuário deve visualizar atividades diárias |
+| RF07 | O usuário deve visualizar cronograma semanal |
+| RF08 | O usuário deve conseguir realizar logout |
+
+---
+
+# ⚙️ Requisitos Não Funcionais (RNF)
+
+| Código | Requisito |
+|---|---|
+| RNF01 | O app deve funcionar em Android e iOS |
+| RNF02 | O sistema deve possuir interface responsiva |
+| RNF03 | O sistema deve possuir navegação intuitiva |
+| RNF04 | O sistema deve manter persistência local de sessão |
+| RNF05 | O código deve possuir testes automatizados |
+| RNF06 | O sistema deve possuir identidade visual consistente |
+
+---
+
+# 🎨 Identidade Visual
+
+O projeto utiliza uma identidade visual dark com verde neon inspirado em:
+- Tecnologia;
+- Natureza;
+- Monitoramento ambiental.
+
+## Paleta de cores
+
+| Elemento | Cor |
+|---|---|
+| Fundo | `#111111` |
+| Cards | `#1C1C1C` |
+| Verde Primário | `#AAFF00` |
+| Texto | `#FFFFFF` |
+| Erro | `#FF4444` |
+
+---
+
+# 🚀 Como Rodar o Projeto
+
+## Instalar dependências
 
 ```bash
-# Instalar dependências
 npm install
+```
 
-# Rodar no Android
+## Iniciar projeto
+
+```bash
+npm start
+```
+
+## Android
+
+```bash
 npm run android
+```
 
-# Rodar testes
+## iOS
+
+```bash
+npm run ios
+```
+
+---
+
+# 🧪 Rodar Testes
+
+```bash
 npm test
 ```
 
 ---
 
-## Fluxo Principal
+# 🔗 Protótipo Figma
 
+Adicionar link do Figma aqui:
+
+```txt
+https://figma.com/SEU-LINK
 ```
-Inicialização
-    │
-    ├─ Usuário tem sessão salva? ──Sim──▶ Dashboard
-    │
-    └─ Não ──▶ Tela de Registro ──▶ Tela de Login ──▶ Dashboard
-                                                           │
-                                                        Logout
-                                                           │
-                                                    Tela de Registro
+
+---
+
+# 🔗 Repositório GitHub
+
+Adicionar link do GitHub aqui:
+
+```txt
+https://github.com/seu-repositorio
 ```
+
+---
+
+# 👥 Integrantes
+
+| Nome | RM |
+|---|---|
+| Leonardo Lopes Oliveira | RM565437 |
+| Lucas Ferrari Lima | RM563119 |
+| Carlos Eduardo Pires Cervelli | RM563462 |
+| Felipe Krzyzanovski dos Santos Menezes | RM564878 |
+| Arthur de Souza Matos Dias | RM566068 |
+| Guilherme Carreri Giampietro | RM565676 |
+| Mateus Patrício Pereira | RM564695 |
+
+---
+
+# 📌 Status do Projeto
+
+✅ Sprint 1 concluída  
+🚧 Preparado para evolução na Sprint 2
