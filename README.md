@@ -254,12 +254,6 @@ npm start
 npm run android
 ```
 
-## iOS
-
-```bash
-npm run ios
-```
-
 ---
 
 # 🧪 Rodar Testes
