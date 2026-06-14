@@ -24,6 +24,14 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "O PrognosisHerba usa sua localização para identificar o trecho da rodovia mais próximo durante o registro de inspeções de poda."
+        }
+      ]
+    ]
   }
 }

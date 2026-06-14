@@ -108,6 +108,18 @@ describe('DashboardScreen', () => {
     expect(getByTestId('stat-horario').props.children).toBe('09:00');
   });
 
+  it('renders trechos da rodovia card', () => {
+    const { getByTestId, getByText } = render(<DashboardScreen />);
+    expect(getByTestId('ver-trechos')).toBeTruthy();
+    expect(getByText('Trechos da Rodovia')).toBeTruthy();
+  });
+
+  it('navigates to Trechos when trechos card is pressed', () => {
+    const { getByTestId } = render(<DashboardScreen />);
+    fireEvent.press(getByTestId('ver-trechos'));
+    expect(mockNavigate).toHaveBeenCalledWith('Trechos');
+  });
+
   it('renders logout button', () => {
     const { getByTestId } = render(<DashboardScreen />);
     expect(getByTestId('logout-button')).toBeTruthy();

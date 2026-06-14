@@ -7,6 +7,8 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import RegisterScreen from './src/screens/RegisterScreen';
 import LoginScreen from './src/screens/LoginScreen';
 import DashboardScreen from './src/screens/DashboardScreen';
+import TrechosScreen from './src/screens/TrechosScreen';
+import TrechoDetailScreen from './src/screens/TrechoDetailScreen';
 import AuthService from './src/services/AuthService';
 import { colors } from './src/theme/colors';
 
@@ -43,6 +45,8 @@ export default function App() {
           <Stack.Screen name="Register" component={RegisterScreen} />
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Dashboard" component={DashboardScreen} />
+          <Stack.Screen name="Trechos" component={TrechosScreen} />
+          <Stack.Screen name="TrechoDetail" component={TrechoDetailScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>

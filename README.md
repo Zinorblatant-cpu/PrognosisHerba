@@ -82,16 +82,28 @@ PrognosisHerba/
 │   ├── LoginScreen.test.js
 │   ├── DashboardScreen.test.js
 │   ├── AuthService.test.js
-│   └── AppNavigation.test.js
+│   ├── AppNavigation.test.js
+│   ├── TrechosService.test.js
+│   ├── LocationService.test.js
+│   ├── TrechosScreen.test.js
+│   └── TrechoDetailScreen.test.js
 ├── src/
 │   ├── screens/
 │   │   ├── RegisterScreen.js
 │   │   ├── LoginScreen.js
-│   │   └── DashboardScreen.js
+│   │   ├── DashboardScreen.js
+│   │   ├── TrechosScreen.js        # Lista de trechos da rodovia (mock + GPS)
+│   │   └── TrechoDetailScreen.js   # Detalhe do trecho + registro de inspeção
 │   ├── components/
 │   │   └── AppLogo.js
 │   ├── services/
-│   │   └── AuthService.js      # Persistência de sessão via AsyncStorage
+│   │   ├── AuthService.js      # Persistência de sessão via AsyncStorage
+│   │   ├── TrechosService.js   # Camada de mock de dados (trechos/inspeções)
+│   │   └── LocationService.js  # Wrapper de GPS (expo-location)
+│   ├── mocks/
+│   │   └── trechosMock.js       # Dados mockados de trechos da rodovia
+│   ├── constants/
+│   │   └── previsaoIA.js        # Níveis de previsão de IA (emoji, cor, prioridade)
 │   └── theme/
 │       └── colors.js
 ├── App.js                      # Navegação + verificação de sessão na inicialização
@@ -129,3 +141,95 @@ Inicialização
                                                            │
                                                     Tela de Registro
 ```
+
+---
+
+## Sprint 2 — Mock de Dados, GPS e Fluxo Funcional
+
+A Sprint 2 evolui o app de um protótipo de autenticação para um app funcional com dados
+mockados, recurso nativo (GPS) e um fluxo completo de interação.
+
+### Mock de dados — `src/mocks/trechosMock.js`
+
+Representa **5 trechos** das rodovias concedidas à Motiva (Anhanguera SP-330, Bandeirantes
+SP-348, Castello Branco SP-280, Raposo Tavares SP-270 e Rodoanel SP-021), cada um com:
+
+- `rodovia`, `km` e `nomeTrecho`
+- `latitude` / `longitude` (usadas pelo recurso de GPS)
+- `statusVegetacao`: `Conforme` 🟢 | `Atenção` 🟡 | `Crítico` 🔴
+- `ultimaInspecao` e `historico` de inspeções anteriores (data, status, observação, técnico)
+- `previsaoIA`: `{ nivel, confianca, motivo }` — previsão automática da necessidade de poda
+  (`Urgente` 🔴 | `Atenção` 🟡 | `Não necessária` 🟢), com % de confiança e justificativa
+- `feedbackPodador`: `{ podaRealizada, previsaoCorreta, dataFeedback }` — feedback do
+  operador sobre a execução da poda e o acerto da previsão da IA
+
+Esses dados simulam o que viria de uma API real de monitoramento de vegetação por trecho.
+
+### Camada de mock — `src/services/TrechosService.js`
+
+Segue o mesmo padrão do `AuthService`: lê/grava no `AsyncStorage` (chave
+`@prognosisherba:trechos`). Na primeira execução, semeia o storage com `trechosMock.js`.
+Expõe:
+
+- `getTrechos()` — lista todos os trechos (faz *backfill* de `previsaoIA`/`feedbackPodador`
+  em dados persistidos antes dessa feature existir)
+- `getTrechoById(id)` — busca um trecho específico
+- `registerInspecao(trechoId, { status, observacao, tecnico })` — registra uma nova
+  inspeção, atualiza o status de vegetação e o histórico, e persiste a alteração
+- `registerFeedback(trechoId, { podaRealizada, previsaoCorreta })` — registra o feedback
+  do podador sobre a execução da poda e o acerto da previsão de IA, com data
+
+### Recurso nativo — GPS (`src/services/LocationService.js`)
+
+Usa `expo-location` para obter a localização atual do operador
+(`requestForegroundPermissionsAsync` + `getCurrentPositionAsync`). A localização é
+combinada com as coordenadas de cada trecho (via cálculo de distância Haversine) para
+destacar o **trecho mais próximo do operador** na lista — conectando um recurso nativo do
+device diretamente ao mock de dados.
+
+### Novas telas
+
+- **TrechosScreen** — lista os trechos com badge de status de vegetação, data da última
+  inspeção e a localização atual do operador; destaca o trecho mais próximo.
+- **TrechoDetailScreen** — exibe os detalhes do trecho selecionado, o histórico completo de
+  inspeções e um formulário para **registrar uma nova inspeção** (status + observação).
+
+### Previsão de IA e feedback do podador
+
+A `TrechosScreen` exibe um banner "🤖 Previsão de IA — Necessidade de Poda" com a legenda
+dos 3 níveis (`src/constants/previsaoIA.js`) e ordena os trechos por prioridade — do mais
+urgente para o desnecessário, com desempate pela distância GPS até o operador. Cada card
+mostra um selo com o nível e a confiança da previsão (ex.: `🤖 IA: 🔴 Urgente • 94% de
+confiança`).
+
+Na `TrechoDetailScreen`, a seção "🤖 Previsão de IA" mostra o nível, a confiança (%) e o
+motivo da classificação. Na seção "Feedback da poda", o operador responde se realizou a
+poda e se a previsão da IA acertou o nível de urgência; o `TrechosService.registerFeedback`
+persiste essa resposta com a data, simulando o ciclo de avaliação do modelo.
+
+### Fluxo funcional demonstrado
+
+```
+Dashboard ──▶ "Trechos da Rodovia" ──▶ Lista de Trechos (status + GPS)
+                                              │
+                                              ▼
+                                      Detalhe do Trecho
+                                              │
+                              Seleciona status + observação
+                                              │
+                                    "Registrar Inspeção"
+                                              │
+                          TrechosService atualiza o mock (AsyncStorage)
+                                              │
+                  Status do trecho e histórico são atualizados na tela
+                          e refletidos na lista ao voltar
+```
+
+Esse fluxo demonstra a ação do usuário (registrar inspeção) alterando os dados mockados e
+a interface refletindo o novo estado em tempo real, sem depender de uma API externa.
+
+### Permissão de localização
+
+O `app.json` inclui o plugin `expo-location` com a descrição de uso da permissão
+(`locationWhenInUsePermission`). Ao abrir a tela **Trechos da Rodovia** pela primeira vez em
+um dispositivo físico, o app solicitará permissão de localização ao usuário.

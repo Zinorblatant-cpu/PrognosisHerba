@@ -103,6 +103,22 @@ export default function DashboardScreen() {
           ))}
         </View>
 
+        {/* Trechos da Rodovia */}
+        <TouchableOpacity
+          testID="ver-trechos"
+          style={styles.section}
+          onPress={() => navigation.navigate('Trechos')}
+          activeOpacity={0.8}
+        >
+          <View style={styles.sectionHeader}>
+            <View>
+              <Text style={styles.sectionTitle}>Trechos da Rodovia</Text>
+              <Text style={styles.sectionDate}>Status de vegetação e inspeções</Text>
+            </View>
+            <Text style={styles.arrow}>›</Text>
+          </View>
+        </TouchableOpacity>
+
         {/* Resumo da Semana */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Resumo da semana</Text>
