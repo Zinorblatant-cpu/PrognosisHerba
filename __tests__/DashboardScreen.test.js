@@ -1,0 +1,163 @@
+import React from 'react';
+import { render, fireEvent, waitFor } from '@testing-library/react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import DashboardScreen from '../src/screens/DashboardScreen';
+
+const mockNavigate = jest.fn();
+const mockReset = jest.fn();
+jest.mock('@react-navigation/native', () => ({
+  useNavigation: () => ({ navigate: mockNavigate, reset: mockReset }),
+  // O Dashboard recarrega o badge de notificacoes e o status do dia ao ganhar
+  // foco; no teste isso equivale a um efeito de montagem.
+  useFocusEffect: (callback) => require('react').useEffect(callback, []),
+}));
+
+jest.mock('@react-native-async-storage/async-storage', () =>
+  require('@react-native-async-storage/async-storage/jest/async-storage-mock')
+);
+
+// O contador de nao lidas e testado em DashboardHeader.test.js, com espera
+// assincrona. Aqui ele e fixado em 0 para nao gerar atualizacao de estado fora
+// de act() nos testes sincronos de renderizacao.
+jest.mock('../src/services/NotificacoesService', () => ({
+  __esModule: true,
+  default: { contarNaoLidas: jest.fn().mockResolvedValue(0) },
+}));
+
+describe('DashboardScreen', () => {
+  beforeEach(async () => {
+    mockNavigate.mockClear();
+    mockReset.mockClear();
+    await AsyncStorage.clear();
+  });
+
+  it('renders user greeting with name', () => {
+    const { getByText } = render(<DashboardScreen />);
+    expect(getByText(/Olá, João!/)).toBeTruthy();
+  });
+
+  it('renders subtitle confira suas atividades', () => {
+    const { getByText } = render(<DashboardScreen />);
+    expect(getByText(/Confira suas atividades/)).toBeTruthy();
+  });
+
+  it('renders notification bell icon', () => {
+    const { getByTestId } = render(<DashboardScreen />);
+    expect(getByTestId('notification-bell')).toBeTruthy();
+  });
+
+  it('renders atividades do dia section title', () => {
+    const { getByText } = render(<DashboardScreen />);
+    expect(getByText('Atividades do Dia')).toBeTruthy();
+  });
+
+  it('renders Poda activity card', () => {
+    const { getByText } = render(<DashboardScreen />);
+    expect(getByText('Poda')).toBeTruthy();
+  });
+
+  it('renders Não Poda activity card', () => {
+    const { getByText } = render(<DashboardScreen />);
+    expect(getByText('Não Poda')).toBeTruthy();
+  });
+
+  it('renders atividades da semana section title', () => {
+    const { getByText } = render(<DashboardScreen />);
+    expect(getByText('Atividades da Semana')).toBeTruthy();
+  });
+
+  it('renders ver calendario link', () => {
+    const { getByTestId } = render(<DashboardScreen />);
+    expect(getByTestId('ver-calendario')).toBeTruthy();
+  });
+
+  it('renders poda days count item', () => {
+    const { getByText } = render(<DashboardScreen />);
+    expect(getByText('Poda em quantos dias')).toBeTruthy();
+  });
+
+  it('renders local da poda item', () => {
+    const { getByText } = render(<DashboardScreen />);
+    expect(getByText('Local da poda')).toBeTruthy();
+  });
+
+  it('renders hora da poda item', () => {
+    const { getByText } = render(<DashboardScreen />);
+    expect(getByText('Hora da poda')).toBeTruthy();
+  });
+
+  it('renders resumo da semana section', () => {
+    const { getByText } = render(<DashboardScreen />);
+    expect(getByText('Resumo da semana')).toBeTruthy();
+  });
+
+  it('renders dias de poda summary stat', () => {
+    const { getByText } = render(<DashboardScreen />);
+    expect(getByText('Dias de poda')).toBeTruthy();
+  });
+
+  it('renders locais summary stat', () => {
+    const { getAllByText } = render(<DashboardScreen />);
+    expect(getAllByText('locais').length).toBeGreaterThan(0);
+  });
+
+  it('renders horario de inicio summary stat', () => {
+    const { getByText } = render(<DashboardScreen />);
+    expect(getByText('horário de início')).toBeTruthy();
+  });
+
+  it('renders 3 dias de poda count', () => {
+    const { getByTestId } = render(<DashboardScreen />);
+    expect(getByTestId('stat-dias').props.children).toBe('3');
+  });
+
+  it('renders 5 locais count', () => {
+    const { getByTestId } = render(<DashboardScreen />);
+    expect(getByTestId('stat-locais').props.children).toBe('5');
+  });
+
+  it('renders 09:00 horario de inicio', () => {
+    const { getByTestId } = render(<DashboardScreen />);
+    expect(getByTestId('stat-horario').props.children).toBe('09:00');
+  });
+
+  it('renders trechos da rodovia card', () => {
+    const { getByTestId, getByText } = render(<DashboardScreen />);
+    expect(getByTestId('ver-trechos')).toBeTruthy();
+    expect(getByText('Trechos da Rodovia')).toBeTruthy();
+  });
+
+  it('navigates to Trechos when trechos card is pressed', () => {
+    const { getByTestId } = render(<DashboardScreen />);
+    fireEvent.press(getByTestId('ver-trechos'));
+    expect(mockNavigate).toHaveBeenCalledWith('Trechos');
+  });
+
+  it('renders logout button', () => {
+    const { getByTestId } = render(<DashboardScreen />);
+    expect(getByTestId('logout-button')).toBeTruthy();
+  });
+
+  it('clears AsyncStorage on logout', async () => {
+    await AsyncStorage.setItem(
+      '@prognosisherba:user',
+      JSON.stringify({ email: 'joao@motiva.com' })
+    );
+    const { getByTestId } = render(<DashboardScreen />);
+    fireEvent.press(getByTestId('logout-button'));
+    await waitFor(async () => {
+      const stored = await AsyncStorage.getItem('@prognosisherba:user');
+      expect(stored).toBeNull();
+    });
+  });
+
+  it('navigates to Register on logout', async () => {
+    const { getByTestId } = render(<DashboardScreen />);
+    fireEvent.press(getByTestId('logout-button'));
+    await waitFor(() => {
+      // reset (e nao navigate) para que o botao "voltar" do aparelho nao
+      // devolva o usuario ao Dashboard depois do logout.
+      expect(mockReset).toHaveBeenCalledWith({ index: 0, routes: [{ name: 'Register' }] });
+    });
+  });
+});
