@@ -103,4 +103,11 @@ describe('LoginScreen', () => {
     const { getByPlaceholderText } = render(<LoginScreen />);
     expect(getByPlaceholderText('COLOQUE SEU EMAIL').props.keyboardType).toBe('email-address');
   });
+
+  it('"Esqueci minha senha" abre a recuperação levando o email digitado', () => {
+    const { getByTestId } = render(<LoginScreen />);
+    fireEvent.changeText(getByTestId('email-input'), ' maria@motiva.com ');
+    fireEvent.press(getByTestId('esqueci-senha'));
+    expect(mockNavigate).toHaveBeenCalledWith('EsqueciSenha', { email: 'maria@motiva.com' });
+  });
 });

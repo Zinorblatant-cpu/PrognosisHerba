@@ -11,6 +11,7 @@ import TrechosService from '../services/TrechosService';
 import LocationService from '../services/LocationService';
 import { PREVISAO_IA_INFO, getPrioridadeIA } from '../constants/previsaoIA';
 import { getStatusInfo } from '../constants/statusVegetacao';
+import { formatarDataCurta } from '../utils/datas';
 
 const FILTROS = [
   { id: 'todos', label: 'Todos' },
@@ -148,6 +149,16 @@ export default function TrechosScreen() {
           style={styles.card}
           onPress={() => navigation.navigate('TrechoDetail', { trechoId: trecho.id })}
           activeOpacity={0.8}
+          accessibilityRole="button"
+          accessibilityLabel={
+            trecho.nomeTrecho +
+            ', ' +
+            trecho.rodovia +
+            '. Status ' +
+            trecho.statusVegetacao +
+            (trecho.previsaoIA ? '. Previsão de IA: ' + trecho.previsaoIA.nivel : '') +
+            (nearestId === trecho.id ? '. Mais próximo de você' : '')
+          }
         >
           <View style={styles.cardHeader}>
             <Text style={styles.cardTitle}>{trecho.nomeTrecho}</Text>
@@ -159,7 +170,7 @@ export default function TrechosScreen() {
           </View>
           <Text style={styles.cardSub}>{trecho.rodovia}</Text>
           <Text style={styles.cardSub}>{trecho.km}</Text>
-          <Text style={styles.cardDate}>Última inspeção: {trecho.ultimaInspecao}</Text>
+          <Text style={styles.cardDate}>Última inspeção: {formatarDataCurta(trecho.ultimaInspecao)}</Text>
 
           {trecho.previsaoIA ? (
             <StatusBadge
@@ -218,6 +229,15 @@ export default function TrechosScreen() {
               PREVISAO_IA_INFO['Não necessária'].emoji +
               ' Não necessária'}
           </Text>
+          <TouchableOpacity
+            testID="abrir-desempenho-ia"
+            onPress={() => navigation.navigate('DesempenhoIA')}
+            accessibilityRole="button"
+            accessibilityLabel="Ver desempenho da IA"
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
+            <Text style={styles.iaLink}>Ver taxa de acerto do modelo ›</Text>
+          </TouchableOpacity>
         </View>
 
         <Text testID="location-info" style={styles.locationInfo}>
@@ -273,6 +293,12 @@ const styles = StyleSheet.create({
     color: colors.textLabel,
     fontSize: 11,
     marginTop: 8,
+  },
+  iaLink: {
+    color: colors.primary,
+    fontSize: 12,
+    fontWeight: '600',
+    marginTop: 10,
   },
   previsaoBadge: {
     marginTop: 8,

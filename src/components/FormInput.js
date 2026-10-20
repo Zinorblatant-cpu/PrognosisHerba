@@ -20,6 +20,8 @@ export default function FormInput({
         style={[styles.input, multiline && styles.multiline, !!error && styles.inputError, style]}
         placeholderTextColor={colors.textMuted}
         multiline={multiline}
+        accessibilityLabel={label ? String(label).replace(/:$/, '') : inputProps.placeholder}
+        accessibilityHint={error || undefined}
         {...inputProps}
       />
       {error ? (

@@ -43,3 +43,7 @@ yarn-error.*
 /ios
 /android
 
+
+# Binários de build (o APK vai para o GitHub Releases, não para o repositório)
+*.apk
+*.aab

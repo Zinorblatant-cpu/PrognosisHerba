@@ -8,16 +8,16 @@ import AuthService from '../services/AuthService';
 import AgendaService from '../services/AgendaService';
 import NotificacoesService from '../services/NotificacoesService';
 import { USUARIO_MOCK, getPrimeiroNome } from '../mocks/usuarioMock';
-import { DATA_REFERENCIA } from '../mocks/agendaMock';
 
 export default function DashboardScreen() {
   const navigation = useNavigation();
 
   // Conteúdo estático da agenda vem do service (camada de mock), não do
   // componente — quando houver API, só o service muda.
-  const atividadesDia = AgendaService.getAtividadesDia();
-  const itensSemana = AgendaService.getItensSemana();
-  const resumoSemana = AgendaService.getResumoSemana();
+  const atividadesDia = AgendaService.getAtividadesDia() || [];
+  const itensSemana = AgendaService.getItensSemana() || [];
+  const resumoSemana = AgendaService.getResumoSemana() || {};
+  const referencia = AgendaService.getDataReferencia() || {};
 
   const [primeiroNome, setPrimeiroNome] = useState(getPrimeiroNome(USUARIO_MOCK.nome));
   const [naoLidas, setNaoLidas] = useState(0);
@@ -106,7 +106,7 @@ export default function DashboardScreen() {
         </View>
 
         {/* Atividades do Dia */}
-        <Card title="Atividades do Dia" subtitle={DATA_REFERENCIA.diaExtenso}>
+        <Card title="Atividades do Dia" subtitle={referencia.diaExtenso}>
           <View style={styles.blocoAtividades}>
             {atividadesDia.map((atividade) => {
               const status = statusDoCard(atividade.tipo);
@@ -116,6 +116,8 @@ export default function DashboardScreen() {
                   testID={'atividade-' + atividade.id}
                   style={styles.activityCard}
                   activeOpacity={0.8}
+                  accessibilityRole="button"
+                  accessibilityLabel={atividade.label + '. ' + (status || atividade.sub)}
                   onPress={() => navigation.navigate('RegistrarPoda', { tipo: atividade.tipo })}
                 >
                   <View style={[styles.activityIcon, { backgroundColor: atividade.cor }]}>
@@ -137,10 +139,11 @@ export default function DashboardScreen() {
         {/* Atividades da Semana */}
         <Card
           title="Atividades da Semana"
-          subtitle={DATA_REFERENCIA.intervaloSemana}
+          subtitle={referencia.intervaloSemana}
           right={
             <TouchableOpacity
               testID="ver-calendario"
+              accessibilityRole="button"
               onPress={() => navigation.navigate('Agenda')}
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             >
@@ -155,6 +158,8 @@ export default function DashboardScreen() {
                 testID={'semana-' + item.id}
                 style={styles.weeklyItem}
                 activeOpacity={0.8}
+                accessibilityRole="button"
+                accessibilityLabel={item.label + ': ' + item.value}
                 onPress={() => navigation.navigate('Agenda')}
               >
                 <Text style={styles.weeklyIcon}>{item.icon}</Text>
@@ -174,6 +179,14 @@ export default function DashboardScreen() {
           title="Trechos da Rodovia"
           subtitle="Status de vegetação, previsão de IA e inspeções"
           onPress={() => navigation.navigate('Trechos')}
+        />
+
+        {/* Desempenho da IA (Sprint 4) */}
+        <Card
+          testID="ver-desempenho-ia"
+          title="🤖 Desempenho da IA"
+          subtitle="Taxa de acerto das previsões, com base no feedback dos podadores"
+          onPress={() => navigation.navigate('DesempenhoIA')}
         />
 
         {/* Resumo da Semana */}

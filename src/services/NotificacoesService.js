@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { NOTIFICACOES_MOCK } from '../mocks/notificacoesMock';
+import { gerarNotificacoesMock, NOTIFICACAO_IDS } from '../mocks/notificacoesMock';
 import MockScenarioService from './MockScenarioService';
 
 const NOTIFICACOES_KEY = '@prognosisherba:notificacoes';
@@ -9,14 +9,14 @@ async function lerIdsLidos() {
   const data = await AsyncStorage.getItem(NOTIFICACOES_KEY);
   if (data) return JSON.parse(data);
 
-  const iniciais = NOTIFICACOES_MOCK.filter((item) => item.lida).map((item) => item.id);
+  const iniciais = gerarNotificacoesMock().filter((item) => item.lida).map((item) => item.id);
   await AsyncStorage.setItem(NOTIFICACOES_KEY, JSON.stringify(iniciais));
   return iniciais;
 }
 
 async function montarLista() {
   const lidos = await lerIdsLidos();
-  return NOTIFICACOES_MOCK.map((item) => ({ ...item, lida: lidos.includes(item.id) }));
+  return gerarNotificacoesMock().map((item) => ({ ...item, lida: lidos.includes(item.id) }));
 }
 
 const NotificacoesService = {
@@ -45,7 +45,7 @@ const NotificacoesService = {
   },
 
   async marcarTodasComoLidas() {
-    const todos = NOTIFICACOES_MOCK.map((item) => item.id);
+    const todos = [...NOTIFICACAO_IDS];
     await MockScenarioService.aplicarEscrita(todos);
     await AsyncStorage.setItem(NOTIFICACOES_KEY, JSON.stringify(todos));
     return montarLista();

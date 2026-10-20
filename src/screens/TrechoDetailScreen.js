@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { colors } from '../theme/colors';
@@ -10,10 +10,30 @@ import FormInput from '../components/FormInput';
 import PrimaryButton from '../components/PrimaryButton';
 import InlineMessage from '../components/InlineMessage';
 import TrechosService from '../services/TrechosService';
+import LocationService from '../services/LocationService';
+import FotoService from '../services/FotoService';
+import AuthService from '../services/AuthService';
+import { formatarDataCurta } from '../utils/datas';
 import { PREVISAO_IA_INFO } from '../constants/previsaoIA';
 import { STATUS_VEGETACAO_OPTIONS } from '../constants/statusVegetacao';
 
-const TECNICO = 'João Silva';
+const TECNICO_PADRAO = 'João Silva';
+
+// Botão Sim/Não dos formulários de feedback, com estado acessível.
+function Escolha({ testID, label, selecionado, onPress }) {
+  return (
+    <TouchableOpacity
+      testID={testID}
+      style={[styles.statusOption, selecionado && styles.statusOptionSelected]}
+      onPress={onPress}
+      accessibilityRole="radio"
+      accessibilityState={{ selected: !!selecionado }}
+      accessibilityLabel={label}
+    >
+      <Text style={[styles.statusOptionText, selecionado && styles.statusOptionTextSelected]}>{label}</Text>
+    </TouchableOpacity>
+  );
+}
 
 export default function TrechoDetailScreen() {
   const navigation = useNavigation();
@@ -28,6 +48,10 @@ export default function TrechoDetailScreen() {
   const [observacao, setObservacao] = useState('');
   const [salvandoInspecao, setSalvandoInspecao] = useState(false);
   const [mensagemInspecao, setMensagemInspecao] = useState(null);
+  const [foto, setFoto] = useState(null);
+  const [mensagemFoto, setMensagemFoto] = useState(null);
+  const [mensagemMapa, setMensagemMapa] = useState(null);
+  const [tecnico, setTecnico] = useState(TECNICO_PADRAO);
 
   const [podaRealizada, setPodaRealizada] = useState(null);
   const [previsaoCorreta, setPrevisaoCorreta] = useState(null);
@@ -63,6 +87,38 @@ export default function TrechoDetailScreen() {
     carregar();
   }, [carregar]);
 
+  // A inspeção é assinada pelo usuário logado (antes era sempre "João Silva").
+  useEffect(() => {
+    let ativo = true;
+    Promise.resolve(AuthService.getPerfil?.())
+      .then((perfil) => {
+        if (ativo && perfil?.nome) setTecnico(perfil.nome);
+      })
+      .catch(() => {});
+    return () => {
+      ativo = false;
+    };
+  }, []);
+
+  async function anexarFoto(origem) {
+    setMensagemFoto(null);
+    try {
+      const uri = origem === 'camera' ? await FotoService.tirarFoto() : await FotoService.escolherDaGaleria();
+      if (uri) setFoto(uri);
+    } catch (e) {
+      setMensagemFoto({ type: 'error', text: e.message });
+    }
+  }
+
+  async function abrirMapa() {
+    setMensagemMapa(null);
+    try {
+      await LocationService.abrirNoMapa(trecho);
+    } catch (e) {
+      setMensagemMapa({ type: 'error', text: 'Não foi possível abrir o app de mapas neste aparelho.' });
+    }
+  }
+
   async function handleRegistrarInspecao() {
     setMensagemInspecao(null);
 
@@ -80,14 +136,19 @@ export default function TrechoDetailScreen() {
       const atualizado = await TrechosService.registerInspecao(trechoId, {
         status: statusSelecionado,
         observacao: observacao.trim(),
-        tecnico: TECNICO,
+        tecnico,
+        ...(foto ? { foto } : {}),
       });
 
       setTrecho(atualizado);
       setObservacao('');
+      setFoto(null);
       setMensagemInspecao({
         type: 'success',
-        text: 'Inspeção registrada. O status do trecho e o histórico foram atualizados.',
+        text:
+          'Inspeção registrada. A previsão de IA foi recalculada: ' +
+          (atualizado.previsaoIA?.nivel || '—') +
+          '.',
       });
     } catch (e) {
       setMensagemInspecao({ type: 'error', text: e.message });
@@ -113,6 +174,10 @@ export default function TrechoDetailScreen() {
 
       setTrecho(atualizado);
       setFeedbackSalvoEm(atualizado.feedbackPodador.dataFeedback);
+      setMensagemFeedback({
+        type: 'success',
+        text: 'Obrigado! Seu feedback entra no cálculo de desempenho da IA.',
+      });
     } catch (e) {
       setMensagemFeedback({ type: 'error', text: e.message });
     } finally {
@@ -155,6 +220,15 @@ export default function TrechoDetailScreen() {
           Status atual: {trecho.statusVegetacao}
         </Text>
 
+        <PrimaryButton
+          testID="abrir-mapa-button"
+          label="📍 ABRIR NO MAPA"
+          variant="secondary"
+          onPress={abrirMapa}
+          style={styles.mapaBotao}
+        />
+        {mensagemMapa ? <InlineMessage testID="mapa-mensagem" {...mensagemMapa} /> : null}
+
         {trecho.previsaoIA ? (
           <Card title="🤖 Previsão de IA" style={styles.cardTopo}>
             <View style={styles.blocoConteudo}>
@@ -172,6 +246,22 @@ export default function TrechoDetailScreen() {
               <Text testID="previsao-ia-motivo" style={styles.previsaoMotivo}>
                 {trecho.previsaoIA.motivo}
               </Text>
+
+              {trecho.previsaoIA.fatores?.length ? (
+                <View testID="previsao-ia-fatores" style={styles.fatores}>
+                  <Text style={styles.fatoresTitulo}>
+                    Como o modelo chegou nesta nota ({trecho.previsaoIA.score}/100):
+                  </Text>
+                  {trecho.previsaoIA.fatores.map((fator, i) => (
+                    <View key={i} style={styles.fatorLinha}>
+                      <Text style={styles.fatorTexto}>{fator.descricao}</Text>
+                      <Text style={[styles.fatorPontos, fator.pontos < 0 && styles.fatorNegativo]}>
+                        {(fator.pontos > 0 ? '+' : '') + fator.pontos}
+                      </Text>
+                    </View>
+                  ))}
+                </View>
+              ) : null}
             </View>
           </Card>
         ) : null}
@@ -180,60 +270,34 @@ export default function TrechoDetailScreen() {
           <View style={styles.blocoConteudo}>
             <Text style={styles.feedbackQuestion}>Você realizou a poda neste trecho?</Text>
             <View style={styles.statusOptions}>
-              <TouchableOpacity
+              <Escolha
                 testID="feedback-poda-sim"
-                style={[styles.statusOption, podaRealizada === true && styles.statusOptionSelected]}
+                label="Sim"
+                selecionado={podaRealizada === true}
                 onPress={() => setPodaRealizada(true)}
-              >
-                <Text
-                  style={[styles.statusOptionText, podaRealizada === true && styles.statusOptionTextSelected]}
-                >
-                  Sim
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
+              />
+              <Escolha
                 testID="feedback-poda-nao"
-                style={[styles.statusOption, podaRealizada === false && styles.statusOptionSelected]}
+                label="Não"
+                selecionado={podaRealizada === false}
                 onPress={() => setPodaRealizada(false)}
-              >
-                <Text
-                  style={[styles.statusOptionText, podaRealizada === false && styles.statusOptionTextSelected]}
-                >
-                  Não
-                </Text>
-              </TouchableOpacity>
+              />
             </View>
 
             <Text style={styles.feedbackQuestion}>A previsão de IA acertou o nível de urgência?</Text>
             <View style={styles.statusOptions}>
-              <TouchableOpacity
+              <Escolha
                 testID="feedback-previsao-sim"
-                style={[styles.statusOption, previsaoCorreta === true && styles.statusOptionSelected]}
+                label="Sim"
+                selecionado={previsaoCorreta === true}
                 onPress={() => setPrevisaoCorreta(true)}
-              >
-                <Text
-                  style={[
-                    styles.statusOptionText,
-                    previsaoCorreta === true && styles.statusOptionTextSelected,
-                  ]}
-                >
-                  Sim
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
+              />
+              <Escolha
                 testID="feedback-previsao-nao"
-                style={[styles.statusOption, previsaoCorreta === false && styles.statusOptionSelected]}
+                label="Não"
+                selecionado={previsaoCorreta === false}
                 onPress={() => setPrevisaoCorreta(false)}
-              >
-                <Text
-                  style={[
-                    styles.statusOptionText,
-                    previsaoCorreta === false && styles.statusOptionTextSelected,
-                  ]}
-                >
-                  Não
-                </Text>
-              </TouchableOpacity>
+              />
             </View>
 
             <PrimaryButton
@@ -259,24 +323,13 @@ export default function TrechoDetailScreen() {
           <View style={styles.blocoConteudo}>
             <View style={styles.statusOptions}>
               {STATUS_VEGETACAO_OPTIONS.map((option) => (
-                <TouchableOpacity
+                <Escolha
                   key={option.key}
                   testID={'status-option-' + option.key}
-                  style={[
-                    styles.statusOption,
-                    statusSelecionado === option.value && styles.statusOptionSelected,
-                  ]}
+                  label={option.emoji + ' ' + option.value}
+                  selecionado={statusSelecionado === option.value}
                   onPress={() => setStatusSelecionado(option.value)}
-                >
-                  <Text
-                    style={[
-                      styles.statusOptionText,
-                      statusSelecionado === option.value && styles.statusOptionTextSelected,
-                    ]}
-                  >
-                    {option.emoji + ' ' + option.value}
-                  </Text>
-                </TouchableOpacity>
+                />
               ))}
             </View>
 
@@ -287,7 +340,39 @@ export default function TrechoDetailScreen() {
               onChangeText={setObservacao}
               multiline
               style={styles.inputEspaco}
+              accessibilityLabel="Observação da inspeção"
             />
+
+            <View style={styles.fotoBotoes}>
+              <PrimaryButton
+                testID="foto-camera-button"
+                label="📷 CÂMERA"
+                variant="secondary"
+                onPress={() => anexarFoto('camera')}
+                style={styles.fotoBotao}
+              />
+              <PrimaryButton
+                testID="foto-galeria-button"
+                label="🖼️ GALERIA"
+                variant="secondary"
+                onPress={() => anexarFoto('galeria')}
+                style={styles.fotoBotao}
+              />
+            </View>
+            {mensagemFoto ? <InlineMessage testID="foto-mensagem" {...mensagemFoto} /> : null}
+            {foto ? (
+              <View testID="foto-preview" style={styles.fotoPreview}>
+                <Image source={{ uri: foto }} style={styles.fotoImagem} accessibilityLabel="Foto anexada à inspeção" />
+                <TouchableOpacity
+                  testID="foto-remover"
+                  onPress={() => setFoto(null)}
+                  accessibilityRole="button"
+                  accessibilityLabel="Remover foto"
+                >
+                  <Text style={styles.fotoRemover}>Remover foto</Text>
+                </TouchableOpacity>
+              </View>
+            ) : null}
 
             <PrimaryButton
               testID="registrar-inspecao-button"
@@ -319,9 +404,17 @@ export default function TrechoDetailScreen() {
                   style={styles.historicoItem}
                 >
                   <Text style={styles.historicoData}>
-                    {item.data} — {item.status}
+                    {formatarDataCurta(item.data)} — {item.status}
                   </Text>
                   <Text style={styles.historicoObs}>{item.observacao}</Text>
+                  {item.foto ? (
+                    <Image
+                      testID={'historico-foto-' + index}
+                      source={{ uri: item.foto }}
+                      style={styles.historicoFoto}
+                      accessibilityLabel={'Foto da inspeção de ' + formatarDataCurta(item.data)}
+                    />
+                  ) : null}
                   <Text style={styles.historicoTecnico}>{item.tecnico}</Text>
                 </View>
               ))
@@ -415,6 +508,70 @@ const styles = StyleSheet.create({
   },
   inputEspaco: {
     marginBottom: 12,
+  },
+  mapaBotao: {
+    marginTop: 12,
+  },
+  fatores: {
+    marginTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#2A2A2A',
+    paddingTop: 10,
+  },
+  fatoresTitulo: {
+    color: colors.textLabel,
+    fontSize: 12,
+    fontWeight: '600',
+    marginBottom: 6,
+  },
+  fatorLinha: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    paddingVertical: 3,
+  },
+  fatorTexto: {
+    color: colors.textMuted,
+    fontSize: 12,
+    flex: 1,
+    marginRight: 8,
+  },
+  fatorPontos: {
+    color: colors.error,
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  fatorNegativo: {
+    color: colors.primary,
+  },
+  fotoBotoes: {
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 12,
+  },
+  fotoBotao: {
+    flex: 1,
+  },
+  fotoPreview: {
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  fotoImagem: {
+    width: '100%',
+    height: 180,
+    borderRadius: 8,
+    backgroundColor: colors.background,
+  },
+  fotoRemover: {
+    color: colors.error,
+    fontSize: 12,
+    marginTop: 8,
+  },
+  historicoFoto: {
+    width: '100%',
+    height: 140,
+    borderRadius: 6,
+    marginTop: 8,
   },
   historicoItem: {
     borderBottomWidth: 1,

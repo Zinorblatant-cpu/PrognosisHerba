@@ -7,7 +7,7 @@ import ScreenHeader from '../components/ScreenHeader';
 import StateView from '../components/StateView';
 import StatusBadge from '../components/StatusBadge';
 import AgendaService from '../services/AgendaService';
-import { AGENDA_STATUS_INFO, DATA_REFERENCIA } from '../mocks/agendaMock';
+import { AGENDA_STATUS_INFO } from '../mocks/agendaMock';
 
 const STATUS_FALLBACK = { emoji: '🗓️', color: '#00294D' };
 
@@ -17,6 +17,7 @@ export default function AgendaScreen() {
   const [carregando, setCarregando] = useState(true);
   const [atualizando, setAtualizando] = useState(false);
   const [erro, setErro] = useState(null);
+  const referencia = AgendaService.getDataReferencia() || {};
 
   const carregar = useCallback(async ({ refresh = false } = {}) => {
     if (refresh) {
@@ -73,7 +74,7 @@ export default function AgendaScreen() {
 
     return dias.map((dia) => {
       const info = AGENDA_STATUS_INFO[dia.status] || STATUS_FALLBACK;
-      const hoje = dia.data === DATA_REFERENCIA.hoje;
+      const hoje = dia.data === referencia.hoje;
 
       return (
         <View key={dia.id} testID={'agenda-dia-' + dia.id} style={[styles.card, hoje && styles.cardHoje]}>
@@ -106,6 +107,8 @@ export default function AgendaScreen() {
               testID={'agenda-abrir-' + dia.id}
               onPress={() => navigation.navigate('TrechoDetail', { trechoId: dia.trechoId })}
               activeOpacity={0.8}
+              accessibilityRole="button"
+              accessibilityLabel={'Ver detalhe do ' + dia.trecho}
             >
               <Text style={styles.link}>Ver detalhe do trecho ›</Text>
             </TouchableOpacity>
@@ -130,7 +133,7 @@ export default function AgendaScreen() {
       >
         <ScreenHeader
           title="Agenda da Semana"
-          subtitle={DATA_REFERENCIA.intervaloSemana + ' • Equipe Alfa'}
+          subtitle={(referencia.intervaloSemana || 'Semana atual') + ' • Equipe Alfa'}
           onBack={() => navigation.goBack()}
         />
         {renderConteudo()}

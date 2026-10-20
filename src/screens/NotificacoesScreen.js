@@ -123,6 +123,8 @@ export default function NotificacoesScreen() {
               style={[styles.card, !item.lida && styles.cardNaoLida]}
               onPress={() => abrirNotificacao(item)}
               activeOpacity={0.8}
+              accessibilityRole="button"
+              accessibilityLabel={(item.lida ? '' : 'Não lida. ') + item.titulo + '. ' + item.mensagem}
             >
               <View style={styles.cardHeader}>
                 <StatusBadge label={tipo.emoji + ' ' + tipo.label} color={tipo.color} />

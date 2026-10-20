@@ -260,3 +260,39 @@ Tests:       179 passed, 179 total
 | `NotificacoesScreen.test.js` | Lista, leitura e estados |
 | `RegistrarPodaScreen.test.js` | Fluxos de poda e de ausência |
 | `PerfilScreen.test.js` | Perfil, cenários de mock e logout |
+
+---
+
+# 🧪 Sprint 4 — Roteiro de validação do APK
+
+**Versão testada:** APK v1.0.0 (perfil `preview` do EAS Build)
+**Data de execução:** ____/____/2026 · **Aparelho / Android:** ______________________
+
+> Preencher a coluna **Resultado** instalando o APK em um aparelho **físico**. Os casos abaixo
+> cobrem apenas o que mudou na Sprint 4; os fluxos das Sprints anteriores seguem válidos pelas
+> tabelas acima e pelos 233 testes automatizados.
+
+| # | Cenário | Resultado esperado | Resultado |
+|---|---|---|---|
+| 9.1 | Instalar o APK pelo link do README | Instala sem erro; ícone do PrognosisHerba (não o do Expo) na tela inicial | |
+| 9.2 | Abrir o app | Splash preta com a logo e, em seguida, tela de Registro | |
+| 9.3 | Cadastro com confirmação de senha vazia | Erro "Confirme sua senha" | |
+| 9.4 | Cadastro com senha de 3 caracteres | Erro "A senha precisa ter pelo menos 6 caracteres" | |
+| 9.5 | Login → "Esqueci minha senha" com conta criada | Código de 6 dígitos exibido; nova senha aceita; login funciona só com a nova | |
+| 9.6 | Digitar código errado 5 vezes | Bloqueio "Muitas tentativas incorretas" | |
+| 9.7 | Dashboard em dia útil | "Atividades do Dia" mostra a data de hoje | |
+| 9.8 | Dashboard no sábado/domingo | Mostra "Próxima diária: Segunda-feira, …" | |
+| 9.9 | Agenda | Semana atual (seg–sex), dia de hoje com etiqueta HOJE, dias anteriores "Concluída" | |
+| 9.10 | Detalhe do trecho Jundiaí | Nível Urgente, nota /100 e lista de fatores com pontos | |
+| 9.11 | Registrar inspeção "Conforme" com "Poda realizada" | Previsão recalculada para "Não necessária" na hora | |
+| 9.12 | 📷 Câmera na inspeção (1ª vez) | Pede permissão de câmera; foto aparece na pré-visualização | |
+| 9.13 | Registrar inspeção com foto | Foto aparece no histórico do trecho | |
+| 9.14 | Negar a permissão de câmera | Mensagem de permissão negada; app continua funcionando | |
+| 9.15 | 📍 Abrir no mapa | Abre Google Maps (ou outro app de mapas) no ponto do trecho | |
+| 9.16 | Salvar feedback "a previsão errou" | Mensagem de agradecimento; Desempenho da IA passa a 13 feedbacks e taxa cai | |
+| 9.17 | Dashboard → Desempenho da IA | Taxa de acerto, barras por nível, lista por trecho e "Como a previsão é calculada" | |
+| 9.18 | Perfil (build de release) | Modo de demonstração **não** aparece | |
+| 9.19 | Tocar 5× na versão do app | Modo de demonstração aparece e continua visível ao reabrir o app | |
+| 9.20 | Cenário "Erro de conexão" → Desempenho da IA | Tela de erro com TENTAR NOVAMENTE | |
+| 9.21 | TalkBack ligado, percorrer o Dashboard | Cards e botões são anunciados com nome e função | |
+| 9.22 | Usar o app por 10 min passando por todas as telas | Nenhum fechamento inesperado | |

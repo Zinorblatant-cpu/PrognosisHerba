@@ -126,4 +126,80 @@ describe('AuthService — cadastro e login (Sprint 3)', () => {
     expect(AuthService.getPrimeiroNome('João Silva')).toBe('João');
     expect(AuthService.getPrimeiroNome('')).toBe('Operador');
   });
+
+  describe('Sprint 4 — senha protegida e recuperação', () => {
+    it('não grava a senha em texto: guarda salt + hash', async () => {
+      await AuthService.registerAccount({ email: 'maria@motiva.com', senha: 'senha123' });
+      const bruto = await AsyncStorage.getItem('@prognosisherba:contas');
+
+      expect(bruto).not.toContain('senha123');
+      const [conta] = JSON.parse(bruto);
+      expect(conta.senha).toBeUndefined();
+      expect(conta.salt).toHaveLength(32);
+      expect(conta.senhaHash).toMatch(/^[0-9a-f]{64}$/);
+    });
+
+    it('migra contas antigas (senha em texto) para hash no primeiro login', async () => {
+      await AsyncStorage.setItem(
+        '@prognosisherba:contas',
+        JSON.stringify([{ email: 'antigo@motiva.com', senha: 'abc123', nome: 'Antigo' }])
+      );
+
+      await AuthService.login({ email: 'antigo@motiva.com', senha: 'abc123' });
+      const [conta] = JSON.parse(await AsyncStorage.getItem('@prognosisherba:contas'));
+      expect(conta.senha).toBeUndefined();
+      expect(conta.senhaHash).toBeTruthy();
+
+      await AuthService.clearUser();
+      await expect(AuthService.login({ email: 'antigo@motiva.com', senha: 'abc123' })).resolves.toBeTruthy();
+    });
+
+    it('fluxo completo: solicitar código, redefinir e entrar com a nova senha', async () => {
+      await AuthService.registerAccount({ email: 'maria@motiva.com', senha: 'senha123' });
+      const { codigo, emailMascarado } = await AuthService.solicitarRecuperacao('maria@motiva.com');
+
+      expect(codigo).toMatch(/^\d{6}$/);
+      expect(emailMascarado).toBe('m***@motiva.com');
+
+      await AuthService.redefinirSenha({ email: 'maria@motiva.com', codigo, novaSenha: 'novaSenha9' });
+      await expect(AuthService.login({ email: 'maria@motiva.com', senha: 'senha123' })).rejects.toThrow();
+      await expect(AuthService.login({ email: 'maria@motiva.com', senha: 'novaSenha9' })).resolves.toBeTruthy();
+    });
+
+    it('recusa código incorreto e bloqueia após 5 tentativas', async () => {
+      await AuthService.registerAccount({ email: 'maria@motiva.com', senha: 'senha123' });
+      const { codigo } = await AuthService.solicitarRecuperacao('maria@motiva.com');
+      const errado = codigo === '000000' ? '111111' : '000000';
+
+      for (let i = 0; i < 4; i++) {
+        await expect(
+          AuthService.redefinirSenha({ email: 'maria@motiva.com', codigo: errado, novaSenha: 'x12345' })
+        ).rejects.toThrow('Código incorreto');
+      }
+      await expect(
+        AuthService.redefinirSenha({ email: 'maria@motiva.com', codigo: errado, novaSenha: 'x12345' })
+      ).rejects.toThrow('Muitas tentativas');
+      await expect(
+        AuthService.redefinirSenha({ email: 'maria@motiva.com', codigo, novaSenha: 'x12345' })
+      ).rejects.toThrow('Solicite um novo código');
+    });
+
+    it('recusa código expirado', async () => {
+      const { Relogio } = require('../src/utils/datas');
+      await AuthService.registerAccount({ email: 'maria@motiva.com', senha: 'senha123' });
+      const { codigo } = await AuthService.solicitarRecuperacao('maria@motiva.com');
+
+      const daquiA11Min = new Date(Date.now() + 11 * 60000);
+      const spy = jest.spyOn(Relogio, 'agora').mockReturnValue(daquiA11Min);
+      await expect(
+        AuthService.redefinirSenha({ email: 'maria@motiva.com', codigo, novaSenha: 'x12345' })
+      ).rejects.toThrow('expirou');
+      spy.mockRestore();
+    });
+
+    it('recusa recuperação de email não cadastrado e da conta de demonstração', async () => {
+      await expect(AuthService.solicitarRecuperacao('ninguem@motiva.com')).rejects.toThrow('Não encontramos');
+      await expect(AuthService.solicitarRecuperacao('joao@motiva.com')).rejects.toThrow('senha fixa');
+    });
+  });
 });

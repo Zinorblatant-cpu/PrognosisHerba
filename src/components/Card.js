@@ -6,7 +6,14 @@ import { colors } from '../theme/colors';
 // (e nesse caso exibe a seta de navegação à direita do título).
 export default function Card({ title, subtitle, right, children, onPress, testID, style }) {
   const Container = onPress ? TouchableOpacity : View;
-  const containerProps = onPress ? { onPress, activeOpacity: 0.8 } : {};
+  const containerProps = onPress
+    ? {
+        onPress,
+        activeOpacity: 0.8,
+        accessibilityRole: 'button',
+        accessibilityLabel: [title, subtitle].filter(Boolean).join('. ') || undefined,
+      }
+    : {};
 
   return (
     <Container testID={testID} style={[styles.card, style]} {...containerProps}>

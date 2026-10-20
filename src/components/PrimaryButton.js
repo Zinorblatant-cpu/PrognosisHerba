@@ -22,6 +22,7 @@ export default function PrimaryButton({
       activeOpacity={0.8}
       disabled={inativo}
       accessibilityRole="button"
+      accessibilityLabel={label}
       accessibilityState={{ disabled: inativo, busy: loading }}
       style={[styles.base, styles[variant], inativo && styles.inativo, style]}
     >

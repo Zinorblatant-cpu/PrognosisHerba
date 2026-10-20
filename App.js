@@ -13,6 +13,8 @@ import NotificacoesScreen from './src/screens/NotificacoesScreen';
 import AgendaScreen from './src/screens/AgendaScreen';
 import RegistrarPodaScreen from './src/screens/RegistrarPodaScreen';
 import PerfilScreen from './src/screens/PerfilScreen';
+import DesempenhoIAScreen from './src/screens/DesempenhoIAScreen';
+import EsqueciSenhaScreen from './src/screens/EsqueciSenhaScreen';
 import AuthService from './src/services/AuthService';
 import { colors } from './src/theme/colors';
 
@@ -55,6 +57,8 @@ export default function App() {
           <Stack.Screen name="Agenda" component={AgendaScreen} />
           <Stack.Screen name="RegistrarPoda" component={RegistrarPodaScreen} />
           <Stack.Screen name="Perfil" component={PerfilScreen} />
+          <Stack.Screen name="DesempenhoIA" component={DesempenhoIAScreen} />
+          <Stack.Screen name="EsqueciSenha" component={EsqueciSenhaScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>

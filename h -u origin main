@@ -1,0 +1,15 @@
+*   [33m10c6e6d[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m Merge histórico das Sprints 1/2 com a Sprint 3
+[31m|[m[32m\[m  
+[31m|[m *   [33m4b51808[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m update no readme
+[31m|[m [33m|[m[34m\[m  
+[31m|[m [33m|[m * [33mfd38f81[m Delete iOS section from README.md
+[31m|[m [33m|[m * [33m3a0e447[m Update Figma link and remove GitHub section
+[31m|[m [33m|[m * [33mfc50864[m Revise README for clarity and project details
+[31m|[m * [34m|[m [33macd5c6a[m update para a sprint 2
+[31m|[m [34m|[m[34m/[m  
+[31m|[m * [33mecb7a6c[m update no logo
+[31m|[m * [33m1e8168c[m first commit
+[31m|[m * [33m90c32c3[m first commit
+[31m|[m * [33m7410e38[m first commit
+[31m|[m * [33mc4ca932[m Initial commit
+* [33maa986c1[m Sprint 3: protótipo funcional completo - 9 telas, cenários de mock, componentes reutilizáveis e documento de testes manuais

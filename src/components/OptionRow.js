@@ -11,7 +11,8 @@ export default function OptionRow({ title, description, selected, onPress, testI
       onPress={onPress}
       activeOpacity={0.8}
       accessibilityRole="radio"
-      accessibilityState={{ selected }}
+      accessibilityState={{ selected: !!selected, checked: !!selected }}
+      accessibilityLabel={description ? title + '. ' + description : title}
       style={[styles.container, selected && styles.containerSelected]}
     >
       <View style={styles.texts}>

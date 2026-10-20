@@ -1,6 +1,11 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import TrechosService from '../src/services/TrechosService';
-import { TRECHOS_MOCK } from '../src/mocks/trechosMock';
+import { gerarTrechosMock } from '../src/mocks/trechosMock';
+import { Relogio } from '../src/utils/datas';
+
+// Dia fixo (terça, 16/06/2026) para o mock e a previsão serem determinísticos.
+const AGORA = new Date(2026, 5, 16, 10, 0);
+const TRECHOS_MOCK = gerarTrechosMock(AGORA);
 
 jest.mock('@react-native-async-storage/async-storage', () =>
   require('@react-native-async-storage/async-storage/jest/async-storage-mock')
@@ -10,15 +15,26 @@ const STORAGE_KEY = '@prognosisherba:trechos';
 
 describe('TrechosService', () => {
   beforeEach(async () => {
+    jest.spyOn(Relogio, 'agora').mockReturnValue(AGORA);
     await AsyncStorage.clear();
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   it('getTrechos seeds AsyncStorage with mock data on first call', async () => {
     const trechos = await TrechosService.getTrechos();
-    expect(trechos).toEqual(TRECHOS_MOCK);
+    expect(trechos.map(({ previsaoIA, ...t }) => t)).toEqual(TRECHOS_MOCK);
 
     const stored = await AsyncStorage.getItem(STORAGE_KEY);
     expect(JSON.parse(stored)).toEqual(TRECHOS_MOCK);
+  });
+
+  it('mock dates are relative to the current day', async () => {
+    const trechos = await TrechosService.getTrechos();
+    const trecho1 = trechos.find((t) => t.id === 'trecho-1');
+    expect(trecho1.ultimaInspecao).toBe('2026-06-02');
   });
 
   it('getTrechos returns persisted data on subsequent calls', async () => {
@@ -27,21 +43,59 @@ describe('TrechosService', () => {
     expect(trechos.length).toBe(TRECHOS_MOCK.length);
   });
 
-  it('getTrechos backfills previsaoIA and feedbackPodador on data persisted before this feature existed', async () => {
-    const trechosAntigos = TRECHOS_MOCK.map(({ previsaoIA, feedbackPodador, ...resto }) => resto);
-    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(trechosAntigos));
-
+  it('getTrechos calcula a previsão de IA na leitura e não a persiste', async () => {
     const trechos = await TrechosService.getTrechos();
     trechos.forEach((trecho) => {
-      expect(trecho.previsaoIA).toBeTruthy();
-      expect(trecho.feedbackPodador).toBeTruthy();
+      expect(trecho.previsaoIA).toMatchObject({
+        nivel: expect.any(String),
+        confianca: expect.any(Number),
+        motivo: expect.any(String),
+      });
     });
 
     const stored = JSON.parse(await AsyncStorage.getItem(STORAGE_KEY));
     stored.forEach((trecho) => {
-      expect(trecho.previsaoIA).toBeTruthy();
+      expect(trecho.previsaoIA).toBeUndefined();
       expect(trecho.feedbackPodador).toBeTruthy();
     });
+  });
+
+  it('re-semeia dados de versões antigas (Sprint 3, datas fixas de junho)', async () => {
+    const antigos = TRECHOS_MOCK.map((t) => ({ ...t, ultimaInspecao: '2020-01-01' }));
+    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(antigos));
+
+    const trechos = await TrechosService.getTrechos();
+    expect(trechos[0].ultimaInspecao).toBe(TRECHOS_MOCK[0].ultimaInspecao);
+  });
+
+  it('registerInspecao recalcula a previsão de IA do trecho', async () => {
+    const antes = await TrechosService.getTrechoById('trecho-1');
+    expect(antes.previsaoIA.nivel).toBe('Urgente');
+
+    const depois = await TrechosService.registerInspecao('trecho-1', {
+      status: 'Conforme',
+      observacao: 'Poda realizada e placa liberada.',
+      tecnico: 'João Silva',
+    });
+    expect(depois.previsaoIA.nivel).toBe('Não necessária');
+  });
+
+  it('registerInspecao guarda a foto anexada', async () => {
+    const updated = await TrechosService.registerInspecao('trecho-2', {
+      status: 'Atenção',
+      observacao: 'Foto da faixa lateral.',
+      tecnico: 'João Silva',
+      foto: 'file:///foto.jpg',
+    });
+    expect(updated.historico[0].foto).toBe('file:///foto.jpg');
+  });
+
+  it('registerFeedback guarda o nível que a IA previa no momento', async () => {
+    const updated = await TrechosService.registerFeedback('trecho-4', {
+      podaRealizada: true,
+      previsaoCorreta: true,
+    });
+    expect(updated.feedbackPodador.nivelPrevisto).toBe('Urgente');
   });
 
   it('getTrechoById returns the matching trecho', async () => {

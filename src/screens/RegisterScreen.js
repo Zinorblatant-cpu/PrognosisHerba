@@ -9,6 +9,8 @@ import InlineMessage from '../components/InlineMessage';
 import { colors } from '../theme/colors';
 import AuthService from '../services/AuthService';
 
+export const SENHA_MINIMA = 6;
+
 export default function RegisterScreen() {
   const navigation = useNavigation();
   const [email, setEmail] = useState('');
@@ -27,8 +29,13 @@ export default function RegisterScreen() {
     }
     if (!password) {
       newErrors.password = 'Senha é obrigatória';
+    } else if (password.length < SENHA_MINIMA) {
+      newErrors.password = 'A senha precisa ter pelo menos ' + SENHA_MINIMA + ' caracteres';
     }
-    if (password && confirmPassword && password !== confirmPassword) {
+    // Sprint 4: antes a confirmação vazia passava direto pela validação.
+    if (password && !confirmPassword) {
+      newErrors.confirmPassword = 'Confirme sua senha';
+    } else if (password && confirmPassword && password !== confirmPassword) {
       newErrors.confirmPassword = 'As senhas não coincidem';
     }
     return newErrors;

@@ -1,139 +1,114 @@
 # PrognosisHerba 🌿
 
-Aplicativo mobile desenvolvido para o **Challenge CCR Motiva — Sprints 1, 2 e 3**, com foco no monitoramento, planejamento e gestão de vegetação em rodovias concedidas.
+**Gestão inteligente de poda e roçada em rodovias concedidas — Challenge CCR Motiva (Sprints 1 a 4)**
 
-> **Sprint 3 — protótipo funcional completo.** Todos os fluxos principais e secundários estão
-> implementados e navegáveis, com mock de dados cobrindo sucesso, erro, listas vazias e
-> fluxos alternativos. Veja o [documento de testes manuais](./TESTES_MANUAIS.md).
+App Android para as equipes de conservação vegetal da Motiva: prevê quais trechos precisam de
+poda, organiza a escala das equipes e registra em campo, com foto e GPS, o que foi feito —
+devolvendo esse retorno ao modelo de previsão.
 
----
-
-# 📖 Sobre o Projeto
-
-O **PrognosisHerba** foi criado para auxiliar operadores de campo, supervisores e gestores responsáveis pela conservação de rodovias da Motiva.
-
-A solução busca otimizar o processo de monitoramento e planejamento de podas e manutenção da vegetação, ajudando equipes operacionais a registrarem atividades de campo, acompanharem cronogramas e organizarem intervenções com mais eficiência.
-
-O projeto foi desenvolvido considerando o contexto operacional apresentado pela CCR Motiva, incluindo:
-- Conservação de rodovias;
-- Gestão de equipes de poda;
-- Necessidades operacionais de campo;
-- Controle de atividades semanais;
-- Organização de informações operacionais.
+| | |
+|---|---|
+| 📲 **APK para download (v1.0.0)** | **[PrognosisHerba-v1.0.0.apk](https://github.com/Zinorblatant-cpu/PrognosisHerba/releases/download/v1.0.0/PrognosisHerba-v1.0.0.apk)** · [página da release](https://github.com/Zinorblatant-cpu/PrognosisHerba/releases/tag/v1.0.0) |
+| 🎬 **Vídeo de pitch e demonstração** | ⚠️ **[INSERIR LINK DO YOUTUBE (não listado)]** |
+| 📈 **Plano de negócio** | [PLANO_DE_NEGOCIO.md](./PLANO_DE_NEGOCIO.md) — resumo na [seção 9](#-9-plano-de-negócio-resumo) |
+| 🧪 **Testes manuais** | [TESTES_MANUAIS.md](./TESTES_MANUAIS.md) |
+| 🎨 **Protótipo Figma** | [PrognosisHerba no Figma](https://www.figma.com/design/U65XJovakZgKdhKiMNkwNe/PrognosisHerba?node-id=0-1&t=kPh46l4wXuSrPu0r-0) |
+| 🔑 **Conta de demonstração** | `joao@motiva.com` · senha `senha123` |
 
 ---
 
-# 🎯 Problema Escolhido
+## Sumário
 
-Atualmente, equipes responsáveis pela conservação vegetal em rodovias enfrentam dificuldades relacionadas a:
-- Organização manual das atividades;
-- Falta de centralização das informações;
-- Dificuldade no acompanhamento das podas programadas;
-- Comunicação operacional pouco eficiente;
-- Necessidade de maior controle das atividades executadas em campo.
-
----
-
-# 💡 Proposta da Solução
-
-O **PrognosisHerba** propõe uma solução mobile para:
-- Planejar atividades de poda;
-- Visualizar tarefas diárias e semanais;
-- Organizar cronogramas operacionais;
-- Facilitar o acompanhamento das equipes;
-- Centralizar informações operacionais em um único sistema.
-
-A aplicação possui um fluxo simples e intuitivo para facilitar o uso em campo.
+1. [Problema](#-1-problema)
+2. [Proposta de solução](#-2-proposta-de-solução)
+3. [Instalar o APK](#-3-instalar-o-apk)
+4. [Telas](#-4-telas)
+5. [Funcionalidades e fluxo](#-5-funcionalidades-e-fluxo)
+6. [Como funciona a previsão de IA](#-6-como-funciona-a-previsão-de-ia)
+7. [Stack](#️-7-stack)
+8. [Rodar, testar e gerar o APK](#-8-rodar-testar-e-gerar-o-apk)
+9. [Plano de negócio (resumo)](#-9-plano-de-negócio-resumo)
+10. [Entregas por Sprint](#️-10-entregas-por-sprint)
+11. [Sprint 4 — o que mudou](#-11-sprint-4--o-que-mudou)
+12. [Por que não migramos para Flutter](#-12-por-que-não-migramos-para-flutter)
+13. [Requisitos](#-13-requisitos)
+14. [Limitações conhecidas](#️-14-limitações-conhecidas)
+15. [Estrutura do projeto](#-15-estrutura-do-projeto)
+16. [Integrantes](#-16-integrantes)
 
 ---
 
-# 👤 Persona Principal
+## 🎯 1. Problema
 
-## Nome:
-Carlos Henrique
+A Motiva administra **13 concessões e cerca de 5 mil km de rodovias**, e a conservação da faixa
+de domínio (roçada, capina e poda) é obrigação contratual em todas elas. Hoje:
 
-## Idade:
-38 anos
+- o cronograma de roçada é **fixo**, mas o crescimento da vegetação não é — no período chuvoso
+  ela cobre placas e curvas; no seco, a equipe roça trecho que não precisava;
+- o registro de campo é **manual**, sem foto nem localização, e se perde até chegar ao planejamento;
+- quem está no campo **não tem como dizer** se a prioridade definida estava certa.
 
-## Cargo:
-Supervisor de Conservação Rodoviária
+Em janeiro de 2026 a própria ANTT alertou as concessionárias sobre o crescimento excessivo de
+vegetação no período chuvoso, com impacto em visibilidade da sinalização, drenagem e segurança
+(detalhes e fontes no [plano de negócio](./PLANO_DE_NEGOCIO.md)).
 
-## Objetivos:
-- Organizar equipes de poda;
-- Monitorar atividades programadas;
-- Melhorar o controle operacional;
-- Garantir maior eficiência na conservação das rodovias.
+## 💡 2. Proposta de solução
 
-## Dores:
-- Falta de padronização dos registros;
-- Controle operacional descentralizado;
-- Dificuldade de acompanhamento em tempo real;
-- Alto volume de atividades manuais.
+> **Roçar o trecho certo, na hora certa, com prova de que foi feito.**
 
----
+1. **Prever** — cada trecho recebe uma nota de 0 a 100 e um nível (🔴 Urgente · 🟡 Atenção ·
+   🟢 Não necessária), calculados a partir do status, do tempo sem inspeção, da época do ano e
+   do risco à sinalização. A nota mostra os fatores que a compõem.
+2. **Executar** — o podador vê a escala da semana, confirma a poda do dia (ou justifica a
+   ausência), encontra o trecho mais próximo pelo GPS e abre a rota no app de mapas.
+3. **Registrar** — inspeção com status, observação e **foto da câmera**; a previsão é recalculada
+   na hora.
+4. **Validar** — o podador responde se a previsão acertou; a tela **Desempenho da IA** consolida a
+   taxa de acerto por nível e por trecho, formando a base de treino do modelo.
 
-# 📸 Telas do App
+**Persona principal:** Carlos Henrique, 38 anos, Supervisor de Conservação Rodoviária — precisa
+organizar equipes de poda, acompanhar o que foi feito e padronizar registros. As demais personas
+(podador e gerente de conservação) estão no [plano de negócio](./PLANO_DE_NEGOCIO.md#3-público-alvo-e-personas).
+
+## 📲 3. Instalar o APK
+
+> O APK **não fica no repositório** (binários não são versionados). Ele está publicado em
+> **GitHub Releases**.
+
+1. No celular Android (7.0 ou superior), abra o link
+   **[PrognosisHerba-v1.0.0.apk](https://github.com/Zinorblatant-cpu/PrognosisHerba/releases/download/v1.0.0/PrognosisHerba-v1.0.0.apk)**.
+2. Toque em **Baixar**. Se o Android avisar sobre o arquivo, toque em **Baixar mesmo assim**.
+3. Abra o arquivo baixado. Na primeira vez, o Android pede para **permitir instalar apps desta
+   fonte** (navegador ou gerenciador de arquivos): permita e volte.
+4. Toque em **Instalar** e depois em **Abrir**.
+5. Entre com a conta de demonstração **`joao@motiva.com` / `senha123`** ou crie uma conta.
+6. Aceite as permissões quando forem pedidas: **localização** (ao abrir *Trechos da Rodovia*) e
+   **câmera** (ao fotografar uma inspeção).
+
+**Para a banca — estados de erro e lista vazia:** na build instalada o *Modo de demonstração*
+fica oculto. Para liberá-lo: **Perfil → toque 5 vezes na versão do app** (rodapé). Ele permite
+simular *lista vazia*, *erro de conexão* e *resposta lenta* em todas as telas.
+
+## 📸 4. Telas
 
 <p align="center">
-  <img src="./assets/screenshots/demo-trechos-ia.gif" width="260" alt="Demonstração: lista de trechos carregando, com previsão de IA, GPS e badges de status"/>
-  <br/>
-  <sub><b>Trechos da Rodovia</b> — carregamento, previsão de IA por trecho e destaque do mais próximo via GPS</sub>
+  <img src="./assets/screenshots/demo-trechos-ia.gif" width="260" alt="Lista de trechos com previsão de IA, GPS e status"/>
 </p>
 
 <table>
   <tr>
-    <td align="center"><b>Login</b><br/><img src="./assets/screenshots/login.jpg" width="220"/></td>
-    <td align="center"><b>Registro</b><br/><img src="./assets/screenshots/registro.jpg" width="220"/></td>
+    <td align="center"><b>Login</b><br/><img src="./assets/screenshots/login.jpg" width="200"/></td>
+    <td align="center"><b>Registro</b><br/><img src="./assets/screenshots/registro.jpg" width="200"/></td>
+    <td align="center"><b>Dashboard</b><br/><img src="./assets/screenshots/dashboard.jpg" width="200"/></td>
   </tr>
   <tr>
-    <td align="center"><b>Dashboard</b><br/><img src="./assets/screenshots/dashboard.jpg" width="220"/></td>
-    <td align="center"><b>Trechos da Rodovia — Previsão de IA</b><br/><img src="./assets/screenshots/trechos-previsao-ia.jpg" width="220"/></td>
-  </tr>
-  <tr>
-    <td align="center" colspan="2"><b>Trechos da Rodovia — Lista completa</b><br/><img src="./assets/screenshots/trechos-lista.jpg" width="220"/></td>
+    <td align="center"><b>Trechos — previsão de IA</b><br/><img src="./assets/screenshots/trechos-previsao-ia.jpg" width="200"/></td>
+    <td align="center"><b>Detalhe — fatores da previsão</b> <sub>(Sprint 4)</sub><br/><img src="./assets/screenshots/detalhe-previsao-ia.jpg" width="200"/></td>
+    <td align="center"><b>Desempenho da IA</b> <sub>(Sprint 4)</sub><br/><img src="./assets/screenshots/desempenho-ia.jpg" width="200"/></td>
   </tr>
 </table>
 
----
-
-# 🛠️ Stack Tecnológica
-
-| Tecnologia | Versão | Finalidade |
-|---|---|---|
-| React Native | 0.81.5 | Desenvolvimento mobile cross-platform |
-| Expo | ~54.0.33 | Ambiente de desenvolvimento e build |
-| React Navigation | ^7 | Navegação entre telas |
-| AsyncStorage | 2.2.0 | Persistência local de sessão e dados mockados |
-| expo-location | ~19.0.8 | Geolocalização (GPS) do operador |
-| Jest | ^29 | Testes automatizados |
-| jest-expo | ^55 | Integração de testes com Expo |
-| Testing Library | ^13 | Testes de componentes |
-
----
-
-# ✅ Justificativa da Stack
-
-### React Native
-Permite desenvolvimento multiplataforma com alta produtividade e reutilização de código.
-
-### Expo
-Facilita configuração, testes e execução do projeto durante o desenvolvimento acadêmico.
-
-### React Navigation
-Estrutura a navegação entre telas de forma organizada e escalável.
-
-### AsyncStorage
-Permite persistência local de sessão e dos dados mockados de trechos/inspeções, sem necessidade de backend nestas Sprints.
-
-### expo-location
-Fornece acesso simples e multiplataforma ao GPS do dispositivo, usado para calcular a distância do operador até cada trecho e destacar o mais próximo.
-
-### Jest + Testing Library
-Garantem qualidade, previsibilidade e cobertura de testes utilizando abordagem TDD.
-
----
-
-# 📱 Fluxo da Aplicação
+## 🧭 5. Funcionalidades e fluxo
 
 ```txt
 Inicialização
@@ -141,573 +116,275 @@ Inicialização
     ├─ Sessão salva? ──Sim──▶ Dashboard
     │
     └─ Não ──▶ Registro ⇄ Login ──▶ Dashboard
-                                        │
-        ┌───────────────┬───────────────┼────────────────┬──────────────┐
-        ▼               ▼               ▼                ▼              ▼
-   Notificações      Agenda      Confirmar Poda      Trechos da      Perfil
-        │          da Semana        / Não Poda          Rodovia          │
-        │               │                                 │          Modo de
-        └───────────────┴────────▶ Detalhe do Trecho ◀─────┘      demonstração
-                                          │                             │
-                              Inspeção + Feedback da IA              Logout
+                  │          └──▶ Esqueci minha senha (código → nova senha)
+                  │
+   Dashboard ─┬─▶ Notificações ───────────────┐
+              ├─▶ Agenda da semana ───────────┤
+              ├─▶ Confirmar poda / Ausência   │
+              ├─▶ Trechos da Rodovia ─────────┼──▶ Detalhe do trecho
+              ├─▶ Desempenho da IA ───────────┘      ├─ previsão + fatores
+              └─▶ Perfil                              ├─ abrir no mapa
+                    ├─ Modo de demonstração           ├─ inspeção + foto
+                    └─ Logout                         └─ feedback da IA
 ```
 
-Todas as setas acima são navegáveis no app — não há tela sem saída nem botão sem ação.
+Nenhuma tela fica sem saída e nenhum botão fica sem ação.
 
----
+| # | Funcionalidade | Status |
+|---|---|---|
+| 1 | Cadastro com validação (email, senha mín. 6, confirmação obrigatória) | ✅ |
+| 2 | Login, sessão persistida e logout com pilha resetada | ✅ |
+| 3 | **Recuperação de senha** com código de 6 dígitos, validade e limite de tentativas | ✅ Sprint 4 |
+| 4 | **Senha protegida** — salt + SHA-256 iterado, migração de contas antigas | ✅ Sprint 4 |
+| 5 | Dashboard com atividades do dia, semana, resumo e badge de notificações | ✅ |
+| 6 | Agenda da semana **ligada à data real do aparelho** | ✅ Sprint 4 |
+| 7 | Confirmar poda (turno) e informar ausência (motivo + justificativa) | ✅ |
+| 8 | Notificações com leitura individual e em massa | ✅ |
+| 9 | Trechos com status, filtros, GPS e trecho mais próximo | ✅ |
+| 10 | **Previsão de IA calculada no app**, com nota, confiança e fatores | ✅ Sprint 4 |
+| 11 | Inspeção com **foto (câmera ou galeria)** | ✅ Sprint 4 |
+| 12 | **Abrir trecho no app de mapas** | ✅ Sprint 4 |
+| 13 | Feedback do podador e **tela Desempenho da IA** | ✅ Sprint 4 |
+| 14 | Perfil do operador | ✅ |
+| 15 | Estados de carregamento, erro (com nova tentativa) e vazio em todas as listas | ✅ |
+| 16 | Modo de demonstração **oculto na build de release** | ✅ Sprint 4 |
+| 17 | **Acessibilidade**: rótulos para leitor de tela e contraste revisado | ✅ Sprint 4 |
+| 18 | Integração com API real e sincronização entre aparelhos | ❌ fora do escopo — ver [§14](#️-14-limitações-conhecidas) |
 
-# 🖥️ Telas Implementadas
+## 🤖 6. Como funciona a previsão de IA
 
-## RegisterScreen
-Tela responsável pelo cadastro de usuários.
+Até a Sprint 3 a previsão era um campo fixo do mock. Na Sprint 4 ela passou a ser **calculada
+no aparelho** pelo `PrevisaoIAService`, a cada leitura — se o operador registra uma inspeção, a
+nota muda na hora.
 
-### Funcionalidades:
-- Cadastro com email e senha;
-- Validação de email;
-- Confirmação de senha;
-- Navegação para login.
+É um **modelo de pontuação explicável** (0–100). Cada fator vira uma linha na tela de detalhe:
 
----
+| Fator | Pontos |
+|---|---|
+| Status da última inspeção | Crítico **+60** · Atenção **+35** · Conforme **+10** |
+| Dias sem inspeção | **+1,0/dia** no período chuvoso (out–mar) · **+0,5/dia** no seco |
+| Piorou entre as duas últimas inspeções | **+10** (melhorou: **−5**) |
+| Observação cita placa, sinalização, visibilidade, curva… | **+15** |
+| Última inspeção "Conforme" registrando poda realizada | **−10** |
 
-## LoginScreen
-Tela responsável pela autenticação do usuário.
+**Nível:** ≥ 70 Urgente · ≥ 40 Atenção · < 40 Não necessária.
+**Confiança:** cresce com a distância da nota até o limiar mais próximo e com o número de inspeções.
 
-### Funcionalidades:
-- Login com email e senha;
-- Persistência de sessão;
-- Navegação automática para dashboard.
+Somos diretos sobre o que isso é: **um baseline heurístico, não um modelo treinado**. Os pesos
+foram definidos pela equipe, não aprendidos de dados. Ele existe para (1) já priorizar de forma
+coerente e explicável e (2) gerar, via feedback dos podadores, o conjunto rotulado que vai treinar
+o modelo de machine learning da próxima fase. A tela **Desempenho da IA** mede exatamente isso.
 
----
+## 🛠️ 7. Stack
 
-## DashboardScreen
-Tela principal do sistema.
+| Tecnologia | Versão | Uso |
+|---|---|---|
+| React Native | 0.81.5 | App mobile |
+| Expo (SDK 54) + EAS Build | ~54.0.33 | Ambiente, build e geração do APK |
+| React Navigation | 7 | Navegação em pilha |
+| AsyncStorage | 2.2.0 | Persistência local (sessão, trechos, agenda, feedbacks) |
+| expo-location | ~19.0.8 | GPS e trecho mais próximo |
+| **expo-image-picker** | ~17.0.11 | **Câmera e galeria na inspeção (Sprint 4)** |
+| Jest + jest-expo + Testing Library | 29 / 54 / 13 | Testes automatizados |
 
-### Funcionalidades:
-- Visualização das atividades do dia;
-- Visualização do cronograma semanal;
-- Resumo operacional;
-- Acesso aos "Trechos da Rodovia";
-- Logout da aplicação.
+**Por quê:** React Native + Expo dá Android e iOS com uma base de código, e o EAS Build gera o
+APK sem exigir Android Studio na máquina de cada integrante. Os recursos nativos (GPS e câmera)
+vêm de módulos oficiais do Expo, com as permissões declaradas no `app.json`.
 
----
+## 🚀 8. Rodar, testar e gerar o APK
 
-## TrechosScreen
-Lista os trechos da rodovia monitorados.
+```bash
+npm install          # dependências
+npm start            # Expo (abra no Expo Go ou emulador)
+npm test             # 233 testes automatizados
+```
 
-### Funcionalidades:
-- Listagem dos trechos com status de vegetação (Conforme / Atenção / Crítico);
-- Localização do operador via GPS e destaque do trecho mais próximo;
-- Banner "Previsão de IA" com legenda dos níveis (Urgente / Atenção / Não necessária);
-- Ordenação dos trechos por prioridade da previsão de IA, com desempate por distância.
+### Gerar o APK (EAS Build)
 
----
+O `eas.json` já tem o perfil `preview`, que gera **APK instalável** (o perfil `production`
+gera `.aab` para a Play Store).
 
-## TrechoDetailScreen
-Tela de detalhe de um trecho da rodovia.
+```bash
+npm install -g eas-cli
+eas login                                    # conta gratuita em expo.dev
+eas build -p android --profile preview       # na 1ª vez, aceite criar o projeto e a keystore
+```
 
-### Funcionalidades:
-- Exibição dos dados do trecho e histórico de inspeções;
-- Previsão de IA (nível, confiança e motivo);
-- Formulário para registrar nova inspeção (status + observação) com validação;
-- Feedback do podador sobre a execução da poda e o acerto da previsão de IA;
-- Estados de carregamento, erro (trecho não encontrado / falha de API) e histórico vazio.
+Ao terminar, o EAS mostra o link do `.apk`. Baixe, renomeie para `PrognosisHerba-v1.0.0.apk` e
+publique em **GitHub → Releases → Draft a new release** com a tag `v1.0.0`. O link do topo deste
+README passa a funcionar automaticamente.
 
----
+| Perfil | Saída | Modo de demonstração |
+|---|---|---|
+| `development` | APK | visível desde o início |
+| `preview` | **APK (entregue)** | oculto — 5 toques na versão libera |
+| `production` | AAB (Play Store) | oculto |
 
-## NotificacoesScreen *(Sprint 3)*
-Central de alertas operacionais e do modelo de IA.
+## 📈 9. Plano de negócio (resumo)
 
-### Funcionalidades:
-- Lista de notificações por tipo (alerta, previsão de IA, agenda, sistema);
-- Destaque visual e contador das não lidas, refletido no badge do Dashboard;
-- Toque na notificação marca como lida e abre o trecho relacionado;
-- "Marcar todas como lidas", pull-to-refresh e estados de carregamento / erro / lista vazia.
+Documento completo, com premissas e fontes: **[PLANO_DE_NEGOCIO.md](./PLANO_DE_NEGOCIO.md)**.
 
----
+- **Proposta de valor:** priorizar a roçada pela necessidade prevista do trecho, não pelo
+  calendário, com evidência de execução para a fiscalização.
+- **Posicionamento:** a Motiva já testa IA com imagens de satélite no Rodoanel. O PrognosisHerba
+  é a **camada de campo** que falta — confirma a execução e mede se a previsão acertou — e
+  alimenta esse modelo em vez de competir com ele.
+- **Público:** concessionárias de rodovias; cliente-âncora Motiva; **piloto proposto na Motiva
+  Autoban (319,8 km)**.
+- **Receita:** piloto pago de **R$ 60 mil** (5 meses) + licença SaaS de **R$ 45/km/mês**
+  (usuários ilimitados) + serviços de integração opcionais.
+- **Custo de operação (estimado):** ~R$ 100 mil/mês na escala completa; equilíbrio com ~2.200 km.
+- **Por que se paga (estimativa):** roçada na malha da Motiva custa na ordem de **R$ 124 mi/ano**
+  (custo direto SICRO/SP); evitar ou realocar **3–5%** dos ciclos economiza **R$ 3,7–6,2 mi/ano**
+  contra **R$ 2,7 mi** de licença.
+- **Maior risco:** sobreposição com a IA de satélite da Motiva — mitigado pela integração.
 
-## AgendaScreen *(Sprint 3)*
-Calendário da escala semanal do operador.
+## 🗓️ 10. Entregas por Sprint
 
-### Funcionalidades:
-- Cinco dias da semana com turno, equipe, trecho, rodovia e descrição;
-- Status por dia: Concluída, Confirmada, Programada e Ausência justificada;
-- Destaque do dia atual e atalho para o detalhe do trecho alocado;
-- Pull-to-refresh e estados de carregamento / erro / escala não publicada.
+| Sprint | Foco | Telas | Testes | Principais entregas |
+|---|---|---|---|---|
+| **1** | Base e autenticação | 3 | — | Registro, login, sessão, dashboard, identidade visual, Figma |
+| **2** | Dados e recurso nativo | 5 | 87 | Trechos, mock de dados, **GPS**, previsão de IA (mock), inspeção, feedback |
+| **3** | Protótipo funcional completo | 9 | 179 | Notificações, agenda, poda/ausência, perfil, **cenários de mock**, componentes reutilizáveis, testes manuais |
+| **4** | **Versão final e negócio** | **11** | **233** | **APK**, previsão calculada, Desempenho da IA, **câmera**, mapa, recuperação de senha, hash de senha, agenda real, acessibilidade, **plano de negócio** |
 
----
+## 🔧 11. Sprint 4 — o que mudou
 
-## RegistrarPodaScreen *(Sprint 3)*
-Tela única que atende os dois cards de "Atividades do Dia".
+### Pontos do documento de testes da Sprint 3
 
-### Funcionalidades:
-- **Confirmar Poda**: escolha do turno (Manhã / Integral / Tarde) + observação;
-- **Informar Ausência** (fluxo alternativo): motivo pré-definido + justificativa;
-- Validação por campo, incluindo justificativa obrigatória em "Outro motivo";
-- Aviso de conflito quando já existe registro contrário para o mesmo dia;
-- O registro atualiza a Agenda e o card do Dashboard.
+| # | Ponto (TESTES_MANUAIS §4) | Situação na Sprint 4 |
+|---|---|---|
+| P1 | Senha em texto puro no AsyncStorage | ✅ **Resolvido** — salt por conta + SHA-256 iterado (1.000×), validado contra vetores do NIST; contas antigas migram no 1º login |
+| P2 | Sem API real | ❌ **Não resolvido** — exige backend; é a Fase 1 do plano de negócio. Os services já isolam as telas da origem dos dados |
+| P3 | Previsão de IA estática | ✅ **Resolvido** — motor de pontuação calculado no app (§6) |
+| P4 | Data "hoje" fixa em 16/06/2026 | ✅ **Resolvido** — agenda, notificações e histórico seguem o relógio do aparelho; no fim de semana o app mostra a próxima diária |
+| P5 | Sem recuperação de senha | ✅ **Resolvido** — fluxo com código de 6 dígitos, validade de 10 min e bloqueio após 5 tentativas |
+| P6 | Feedback da IA sem consolidação | ✅ **Resolvido** — tela *Desempenho da IA* |
+| P7 | Sem fila de sincronização offline | ⚠️ **Parcial** — o app funciona 100% offline (dados locais); a fila só faz sentido com o backend (Fase 1) |
+| P8 | Inspeção só com texto | ✅ **Resolvido** — foto pela câmera ou galeria, exibida no histórico |
+| P9 | Sem mapa | ✅ **Resolvido** — "Abrir no mapa" leva o trecho ao app de mapas do aparelho |
+| P10 | Modo de demonstração visível | ✅ **Resolvido** — oculto na build de release, liberável por 5 toques |
+| P11 | Acessibilidade não revisada | ✅ **Resolvido (básico)** — rótulos e estados para leitor de tela em botões, cards, opções e campos; cinza secundário de 4,8:1 para 6,1:1 |
+| P12 | Sem testes E2E | ❌ **Não resolvido** — a cobertura segue sendo de unidade e componente (233 testes) |
 
----
+### Defeitos encontrados e corrigidos nesta Sprint
 
-## PerfilScreen *(Sprint 3)*
-Dados do operador e configurações do app.
+- **Datas em UTC:** registros feitos depois das 21h (horário de Brasília) eram gravados com a
+  data do dia seguinte, porque o código usava `toISOString()`. Agora tudo usa a data local.
+- **Confirmação de senha vazia passava no cadastro:** a validação só comparava as senhas quando
+  as duas estavam preenchidas.
+- **Ícone e splash padrão do Expo:** o app instalado mostraria o ícone genérico do Expo. Ícone,
+  ícone adaptativo e splash agora usam a logo do PrognosisHerba.
+- **Técnico fixo nas inspeções:** toda inspeção era assinada por "João Silva"; agora usa o
+  usuário logado.
 
-### Funcionalidades:
-- Perfil operacional (nome, cargo, matrícula, equipe, regional, telefone);
-- **Modo de demonstração**: alterna os cenários da camada de mock em tempo de execução;
-- "Restaurar dados de demonstração", que devolve trechos, agenda e notificações ao original;
-- Logout da conta.
+### Novos testes
 
----
+`PrevisaoIAService`, `DesempenhoIAService`, `DesempenhoIAScreen`, `EsqueciSenhaScreen`,
+`PerfilModoDemo`, `sha256`, além de casos novos em `AuthService`, `AgendaService`,
+`TrechosService`, `TrechoDetailScreen`, `LocationService`, `RegisterScreen`, `LoginScreen` e
+`DashboardScreen`. **Total: 233 testes em 24 suítes**, todos passando. O bundle Android de
+produção também foi gerado com `npx expo export --platform android` sem erros.
 
-# 📂 Estrutura do Projeto
+## 🔁 12. Por que não migramos para Flutter
+
+A migração era opcional e **mantivemos React Native + Expo** nas quatro Sprints, então não há
+código Flutter a reaproveitar. Os motivos:
+
+- O escopo das Sprints 1 e 2 já estava entregue e testado nessa stack; migrar significaria
+  reescrever telas, services e testes só para voltar ao mesmo ponto.
+- O Expo cobre os dois recursos nativos que a solução usa (GPS e câmera) e gera o APK pelo EAS
+  Build, que era o entregável da Sprint 4.
+- A equipe domina JavaScript/React, o que permitiu usar as Sprints 3 e 4 para **ampliar o
+  produto** em vez de reconstruí-lo.
+- A suíte de testes cresceu de 87 para 233 casos sem troca de ferramenta, servindo de rede de
+  segurança em todas as refatorações.
+
+## 📋 13. Requisitos
+
+### Funcionais
+
+| Código | Requisito |
+|---|---|
+| RF01 | Cadastro de usuário |
+| RF02 | Login |
+| RF03 | Validação de email |
+| RF04 | Validação e obrigatoriedade da confirmação de senha |
+| RF05 | Persistência de sessão |
+| RF06 | Visualizar atividades do dia |
+| RF07 | Visualizar cronograma semanal |
+| RF08 | Logout |
+| RF09 | Listar trechos com status de vegetação |
+| RF10 | Obter localização via GPS e destacar o trecho mais próximo |
+| RF11 | Exibir previsão de IA por trecho, **calculada a partir dos dados do trecho** |
+| RF12 | Registrar inspeção (status + observação + **foto opcional**) |
+| RF13 | Registrar feedback sobre a poda e o acerto da previsão |
+| RF14 | Consultar notificações e marcá-las como lidas |
+| RF15 | Visualizar a escala da semana |
+| RF16 | Confirmar a poda do dia informando o turno |
+| RF17 | Informar e justificar ausência |
+| RF18 | Filtrar trechos por status |
+| RF19 | Consultar perfil operacional |
+| RF20 | Comunicar carregamento, listas vazias e erros, com nova tentativa |
+| **RF21** | **Recuperar a senha por código de verificação** |
+| **RF22** | **Consultar a taxa de acerto da previsão de IA** |
+| **RF23** | **Abrir a localização do trecho no app de mapas** |
+| **RF24** | **Exibir os fatores que compõem a previsão** |
+
+### Não funcionais
+
+| Código | Requisito |
+|---|---|
+| RNF01 | Funcionar em Android (APK) e iOS |
+| RNF02 | Interface responsiva |
+| RNF03 | Navegação intuitiva, sem tela sem saída nem botão sem ação |
+| RNF04 | Persistência local de sessão e dados |
+| RNF05 | Testes automatizados |
+| RNF06 | Identidade visual consistente sobre componentes reutilizáveis |
+| RNF07 | Pedir permissão antes de usar GPS e câmera |
+| RNF08 | Informar falhas de carregamento com nova tentativa |
+| **RNF09** | **Senhas nunca gravadas em texto** |
+| **RNF10** | **Datas calculadas no fuso local do aparelho** |
+| **RNF11** | **Contraste mínimo WCAG AA (4,5:1) no texto e rótulos para leitor de tela** |
+| **RNF12** | **Recursos de simulação ocultos na build de release** |
+
+## ⚠️ 14. Limitações conhecidas
+
+Listadas de propósito — é o que a banca deve saber antes de avaliar:
+
+- **Sem backend.** Toda a persistência é local (AsyncStorage); dois aparelhos não compartilham
+  dados. Login e recuperação de senha são locais — o código de recuperação aparece na tela
+  porque não há servidor de email.
+- **A previsão é heurística**, com pesos definidos pela equipe (§6), não um modelo treinado.
+- **Histórico de feedbacks é mock.** A tela Desempenho da IA parte de 12 feedbacks simulados de
+  semanas anteriores; os feedbacks registrados no app somam a eles.
+- **Fotos ficam no armazenamento do app** e não são enviadas a lugar nenhum.
+- **Sem testes E2E** (Detox/Maestro).
+
+## 📂 15. Estrutura do projeto
 
 ```txt
 PrognosisHerba/
-├── App.js                        # Navegação e verificação de sessão
-├── index.js                      # Registro do app no Expo
-├── app.json                      # Configuração Expo (inclui plugin expo-location)
-├── assets/
-│   ├── logoPrognosisherba.png
-│   ├── icon.png / adaptive-icon.png / splash-icon.png / favicon.png
-│   └── screenshots/               # Capturas de tela usadas neste README
-├── TESTES_MANUAIS.md              # Documento de testes manuais da Sprint 3
+├── App.js                         # Navegação (11 telas) e verificação de sessão
+├── app.json                       # Expo: ícone, splash, pacote Android, permissões
+├── eas.json                       # Perfis de build (APK / AAB)
+├── PLANO_DE_NEGOCIO.md            # Plano de negócio (Sprint 4)
+├── TESTES_MANUAIS.md              # Testes manuais (Sprint 3) + roteiro do APK (Sprint 4)
+├── assets/                        # Logo, ícones e screenshots
 ├── src/
-│   ├── components/                # Componentes reutilizáveis (identidade visual única)
-│   │   ├── AppLogo.js             # Logo (Register/Login)
-│   │   ├── ScreenHeader.js        # Voltar + título + subtítulo das telas internas
-│   │   ├── Card.js                # Bloco de conteúdo, clicável quando recebe onPress
-│   │   ├── PrimaryButton.js       # Botão padrão (primary / secondary / danger + loading)
-│   │   ├── FormInput.js           # Rótulo + input + mensagem de erro
-│   │   ├── StateView.js           # Estados de carregamento, erro e lista vazia
-│   │   ├── InlineMessage.js       # Retorno de formulário (sucesso / erro / info)
-│   │   ├── StatusBadge.js         # Selo colorido de status
-│   │   ├── FilterChips.js         # Barra de filtros por status
-│   │   └── OptionRow.js           # Linha de seleção única (turno, motivo, cenário)
-│   ├── constants/
-│   │   ├── previsaoIA.js          # Níveis de previsão de IA (emoji, cor, prioridade)
-│   │   └── statusVegetacao.js     # Status de vegetação (emoji, cor, gravidade)
-│   ├── mocks/
-│   │   ├── trechosMock.js         # 5 trechos de rodovias da Motiva
-│   │   ├── agendaMock.js          # Escala da semana, turnos e motivos de ausência
-│   │   ├── notificacoesMock.js    # Notificações operacionais e de IA
-│   │   ├── usuarioMock.js         # Operador e conta de demonstração
-│   │   └── mockScenarios.js       # Cenários: sucesso, vazio, erro e lento
-│   ├── screens/
-│   │   ├── RegisterScreen.js
-│   │   ├── LoginScreen.js
-│   │   ├── DashboardScreen.js
-│   │   ├── TrechosScreen.js       # Lista + GPS + IA + filtros + estados
-│   │   ├── TrechoDetailScreen.js  # Detalhe, histórico, inspeção e feedback
-│   │   ├── NotificacoesScreen.js  # Central de notificações
-│   │   ├── AgendaScreen.js        # Escala da semana
-│   │   ├── RegistrarPodaScreen.js # Confirmar poda / informar ausência
-│   │   └── PerfilScreen.js        # Perfil + modo de demonstração + logout
-│   ├── services/
-│   │   ├── AuthService.js         # Sessão, cadastro e login (mock)
-│   │   ├── TrechosService.js      # Mock + AsyncStorage de trechos/inspeções
-│   │   ├── AgendaService.js       # Escala, confirmação de poda e ausência
-│   │   ├── NotificacoesService.js # Notificações e controle de leitura
-│   │   ├── MockScenarioService.js # Aplica o cenário ativo às respostas dos services
-│   │   └── LocationService.js     # Wrapper do expo-location (GPS)
-│   └── theme/
-│       └── colors.js              # Paleta de cores do app
-└── __tests__/                     # 18 suítes / 179 testes
-    ├── AppNavigation.test.js          ├── AgendaService.test.js
-    ├── AuthService.test.js            ├── NotificacoesService.test.js
-    ├── LocationService.test.js        ├── MockScenarioService.test.js
-    ├── TrechosService.test.js         ├── AgendaScreen.test.js
-    ├── RegisterScreen.test.js         ├── NotificacoesScreen.test.js
-    ├── LoginScreen.test.js            ├── RegistrarPodaScreen.test.js
-    ├── DashboardScreen.test.js        ├── PerfilScreen.test.js
-    ├── DashboardHeader.test.js        ├── TrechosScreenEstados.test.js
-    ├── TrechosScreen.test.js          └── TrechoDetailScreen.test.js
+│   ├── components/                # Card, PrimaryButton, FormInput, StateView, OptionRow…
+│   ├── config/app.js              # Versão e regra do modo de demonstração
+│   ├── constants/                 # Níveis de previsão e status de vegetação
+│   ├── mocks/                     # Trechos, agenda, notificações, usuário, feedbacks, cenários
+│   ├── screens/                   # 11 telas (+ DesempenhoIA e EsqueciSenha na Sprint 4)
+│   ├── services/                  # Auth, Trechos, Agenda, Notificações, Location, Foto,
+│   │                              # PrevisaoIA, DesempenhoIA, MockScenario
+│   ├── theme/colors.js
+│   └── utils/                     # datas.js (fuso local, semana operacional), sha256.js
+└── __tests__/                     # 24 suítes / 233 testes
 ```
 
----
-
-# 🧪 Testes
-
-O projeto utiliza abordagem **TDD (Test Driven Development)**: os testes são escritos antes da implementação.
-
-## Cobertura atual:
-- Navegação (sessão salva → Dashboard / sem sessão → Registro);
-- Cadastro, validação de email/senha e recusa de email já cadastrado;
-- Login com credenciais válidas e inválidas, e persistência de sessão;
-- Dashboard (conteúdo, badge de notificações e destino de **todos** os cards);
-- Trechos da Rodovia (listagem, status, GPS, previsão de IA, filtros e estados);
-- Detalhe do trecho (histórico, inspeção, feedback, validações e falha de gravação);
-- Agenda, Notificações, Confirmar Poda / Informar Ausência e Perfil;
-- Cenários de mock: sucesso, lista vazia, erro de conexão e resposta lenta;
-- Serviços: AuthService, TrechosService, LocationService, AgendaService,
-  NotificacoesService e MockScenarioService.
-
-## Total:
-✅ **179 testes passando em 18 suítes** (Sprint 2: 87 testes em 9 suítes).
-
-O bundle de produção também foi verificado com
-`npx expo export --platform android` → **864 módulos, 0 erros**.
-
----
-
-# 🔒 Requisitos Funcionais (RF)
-
-| Código | Requisito |
-|---|---|
-| RF01 | O usuário deve conseguir realizar cadastro |
-| RF02 | O usuário deve conseguir realizar login |
-| RF03 | O sistema deve validar email |
-| RF04 | O sistema deve validar confirmação de senha |
-| RF05 | O sistema deve persistir sessão |
-| RF06 | O usuário deve visualizar atividades diárias |
-| RF07 | O usuário deve visualizar cronograma semanal |
-| RF08 | O usuário deve conseguir realizar logout |
-| RF09 | O sistema deve listar os trechos da rodovia com status de vegetação |
-| RF10 | O sistema deve obter a localização do operador via GPS e destacar o trecho mais próximo |
-| RF11 | O sistema deve exibir uma previsão de IA sobre a necessidade de poda por trecho |
-| RF12 | O usuário deve conseguir registrar uma nova inspeção (status + observação) em um trecho |
-| RF13 | O usuário deve conseguir registrar feedback sobre a poda realizada e o acerto da previsão de IA |
-| RF14 | O usuário deve conseguir consultar suas notificações e marcá-las como lidas |
-| RF15 | O usuário deve conseguir visualizar a escala da semana em um calendário |
-| RF16 | O usuário deve conseguir confirmar a poda do dia informando o turno |
-| RF17 | O usuário deve conseguir informar e justificar a ausência no dia |
-| RF18 | O usuário deve conseguir filtrar os trechos por status de vegetação |
-| RF19 | O usuário deve conseguir consultar seu perfil operacional |
-| RF20 | O sistema deve comunicar carregamento, listas vazias e erros de carregamento, com nova tentativa |
-
----
-
-# ⚙️ Requisitos Não Funcionais (RNF)
-
-| Código | Requisito |
-|---|---|
-| RNF01 | O app deve funcionar em Android e iOS |
-| RNF02 | O sistema deve possuir interface responsiva |
-| RNF03 | O sistema deve possuir navegação intuitiva |
-| RNF04 | O sistema deve manter persistência local de sessão |
-| RNF05 | O código deve possuir testes automatizados |
-| RNF06 | O sistema deve possuir identidade visual consistente |
-| RNF07 | O sistema deve solicitar permissão de localização ao usuário antes de usar o GPS |
-| RNF08 | O sistema deve informar o usuário em caso de falha de carregamento, oferecendo nova tentativa |
-| RNF09 | A interface deve ser construída sobre componentes reutilizáveis compartilhados entre as telas |
-| RNF10 | Nenhuma tela pode ficar sem saída de navegação nem apresentar controles sem ação |
-
----
-
-# 🎨 Identidade Visual
-
-O projeto utiliza uma identidade visual dark com verde neon inspirado em:
-- Tecnologia;
-- Natureza;
-- Monitoramento ambiental.
-
-## Paleta de cores
-
-| Elemento | Cor |
-|---|---|
-| Fundo | `#111111` |
-| Cards | `#1C1C1C` |
-| Verde Primário | `#AAFF00` |
-| Texto | `#FFFFFF` |
-| Erro | `#FF4444` |
-
----
-
-# 🚀 Como Rodar o Projeto
-
-## Instalar dependências
-
-```bash
-npm install
-```
-
-## Iniciar projeto
-
-```bash
-npm start
-```
-
-## Android
-
-```bash
-npm run android
-```
-
----
-
-# 🧪 Rodar Testes
-
-```bash
-npm test
-```
-
----
-
-# 🔗 Protótipo Figma
-
-```txt
-https://www.figma.com/design/U65XJovakZgKdhKiMNkwNe/PrognosisHerba?node-id=0-1&t=kPh46l4wXuSrPu0r-0
-```
-
----
-
-# 🚀 Sprint 2 — Mock de Dados, GPS e Fluxo Funcional
-
-A Sprint 2 evolui o app de um protótipo de autenticação para um app funcional com dados
-mockados, recurso nativo (GPS) e um fluxo completo de interação.
-
-### Mock de dados — `src/mocks/trechosMock.js`
-
-Representa **5 trechos** das rodovias concedidas à Motiva (Anhanguera SP-330, Bandeirantes
-SP-348, Castello Branco SP-280, Raposo Tavares SP-270 e Rodoanel SP-021), cada um com:
-
-- `rodovia`, `km` e `nomeTrecho`
-- `latitude` / `longitude` (usadas pelo recurso de GPS)
-- `statusVegetacao`: `Conforme` 🟢 | `Atenção` 🟡 | `Crítico` 🔴
-- `ultimaInspecao` e `historico` de inspeções anteriores (data, status, observação, técnico)
-- `previsaoIA`: `{ nivel, confianca, motivo }` — previsão automática da necessidade de poda
-  (`Urgente` 🔴 | `Atenção` 🟡 | `Não necessária` 🟢), com % de confiança e justificativa
-- `feedbackPodador`: `{ podaRealizada, previsaoCorreta, dataFeedback }` — feedback do
-  operador sobre a execução da poda e o acerto da previsão da IA
-
-Esses dados simulam o que viria de uma API real de monitoramento de vegetação por trecho.
-
-### Camada de mock — `src/services/TrechosService.js`
-
-Segue o mesmo padrão do `AuthService`: lê/grava no `AsyncStorage` (chave
-`@prognosisherba:trechos`). Na primeira execução, semeia o storage com `trechosMock.js`.
-Expõe:
-
-- `getTrechos()` — lista todos os trechos (faz *backfill* de `previsaoIA`/`feedbackPodador`
-  em dados persistidos antes dessa feature existir)
-- `getTrechoById(id)` — busca um trecho específico
-- `registerInspecao(trechoId, { status, observacao, tecnico })` — registra uma nova
-  inspeção, atualiza o status de vegetação e o histórico, e persiste a alteração
-- `registerFeedback(trechoId, { podaRealizada, previsaoCorreta })` — registra o feedback
-  do podador sobre a execução da poda e o acerto da previsão de IA, com data
-
-### Recurso nativo — GPS (`src/services/LocationService.js`)
-
-Usa `expo-location` para obter a localização atual do operador
-(`requestForegroundPermissionsAsync` + `getCurrentPositionAsync`). A localização é
-combinada com as coordenadas de cada trecho (via cálculo de distância Haversine) para
-destacar o **trecho mais próximo do operador** na lista — conectando um recurso nativo do
-device diretamente ao mock de dados.
-
-### Previsão de IA e feedback do podador
-
-A `TrechosScreen` exibe um banner "🤖 Previsão de IA — Necessidade de Poda" com a legenda
-dos 3 níveis (`src/constants/previsaoIA.js`) e ordena os trechos por prioridade — do mais
-urgente para o desnecessário, com desempate pela distância GPS até o operador. Cada card
-mostra um selo com o nível e a confiança da previsão (ex.: `🤖 IA: 🔴 Urgente • 94% de
-confiança`).
-
-Na `TrechoDetailScreen`, a seção "🤖 Previsão de IA" mostra o nível, a confiança (%) e o
-motivo da classificação. Na seção "Feedback da poda", o operador responde se realizou a
-poda e se a previsão da IA acertou o nível de urgência; o `TrechosService.registerFeedback`
-persiste essa resposta com a data, simulando o ciclo de avaliação do modelo.
-
-### Fluxo funcional demonstrado
-
-```
-Dashboard ──▶ "Trechos da Rodovia" ──▶ Lista de Trechos (status + GPS)
-                                              │
-                                              ▼
-                                      Detalhe do Trecho
-                                              │
-                              Seleciona status + observação
-                                              │
-                                    "Registrar Inspeção"
-                                              │
-                          TrechosService atualiza o mock (AsyncStorage)
-                                              │
-                  Status do trecho e histórico são atualizados na tela
-                          e refletidos na lista ao voltar
-```
-
-Esse fluxo demonstra a ação do usuário (registrar inspeção) alterando os dados mockados e
-a interface refletindo o novo estado em tempo real, sem depender de uma API externa.
-
-### Permissão de localização
-
-O `app.json` inclui o plugin `expo-location` com a descrição de uso da permissão
-(`locationWhenInUsePermission`). Ao abrir a tela **Trechos da Rodovia** pela primeira vez em
-um dispositivo físico, o app solicitará permissão de localização ao usuário.
-
----
-
-# 🚀 Sprint 3 — Protótipo Funcional Completo
-
-A Sprint 3 fecha o app: **todos** os fluxos definidos nas Sprints anteriores estão
-implementados e navegáveis, a camada de mock passou a cobrir os cenários completos da
-solução e a interface foi unificada sobre componentes reutilizáveis.
-
-## 1. Por que continuamos em React Native (e não migramos para Flutter)
-
-A migração para Flutter era opcional. Optamos por **manter React Native + Expo**:
-
-- O escopo das Sprints 1 e 2 já estava entregue, testado e validado nesta stack — migrar
-  significaria reescrever 5 telas, 3 services e 87 testes apenas para chegar ao mesmo ponto,
-  consumindo a Sprint inteira sem entregar nenhum fluxo novo;
-- O Expo já resolve o recurso nativo que a solução exige (GPS via `expo-location`), com
-  permissão declarada no `app.json` e funcionando em Android e iOS;
-- A equipe tem domínio de JavaScript/React, o que permitiu usar a Sprint para **ampliar o
-  escopo** (4 telas novas, cenários de mock, componentes reutilizáveis) em vez de reconstruir
-  o que já existia;
-- A suíte automatizada com Jest + Testing Library foi preservada e ampliada de 87 para 179
-  testes, servindo de rede de segurança durante toda a refatoração.
-
-## 2. Fluxos que estavam incompletos e foram fechados
-
-Na Sprint 2, vários controles do Dashboard eram `TouchableOpacity` **sem `onPress`** — ou
-seja, botões que não faziam nada. Esta Sprint eliminou todos eles:
-
-| Controle | Antes (Sprint 2) | Agora (Sprint 3) |
-|---|---|---|
-| 🔔 Sino de notificações | Sem ação | Abre `NotificacoesScreen`, com badge de não lidas |
-| Card "Poda" | Sem ação | Abre `RegistrarPodaScreen` (confirmação de turno) |
-| Card "Não Poda" | Sem ação | Abre `RegistrarPodaScreen` (justificativa de ausência) |
-| "Ver calendário" | Sem ação | Abre `AgendaScreen` |
-| Itens de "Atividades da Semana" | Sem ação | Abrem `AgendaScreen` |
-| Acesso ao perfil | Não existia | Ícone 👤 abre `PerfilScreen` |
-
-Outros dois defeitos de navegação também foram corrigidos:
-
-- **Pilha de navegação após login/logout**: o app usava `navigate`, então o botão "voltar" do
-  Android devolvia o usuário à tela de Login depois de entrar (e ao Dashboard depois de sair).
-  Agora usa `navigation.reset`, e a tela anterior deixa de existir na pilha.
-- **Lista de trechos desatualizada**: uma inspeção registrada no detalhe não aparecia na lista
-  ao voltar, porque a tela só carregava na montagem. Agora recarrega com `useFocusEffect`.
-
-## 3. Evolução da camada de mock — cenários completos
-
-A Sprint pede mocks cobrindo *sucesso, erro, listas vazias e fluxos alternativos*. Em vez de
-deixar esses estados presos no código, criamos o **Modo de demonstração** (`PerfilScreen`),
-que troca o comportamento da camada de mock em tempo de execução:
-
-```txt
-Tela  ──▶  Service  ──▶  MockScenarioService.aplicar()  ──▶  resposta
-                                    │
-             ┌──────────────┬───────┴───────┬────────────────┐
-             ▼              ▼               ▼                ▼
-        ✅ sucesso     📭 vazio        ⚠️ erro          🐢 lento
-        dados reais    retorna []   lança MockApiError   +2,5 s
-```
-
-| Cenário | O que a interface mostra |
-|---|---|
-| ✅ **Dados completos** | Listas preenchidas — comportamento padrão |
-| 📭 **Listas vazias** | Estados "Nenhum trecho monitorado", "Nenhuma notificação por aqui", "Nenhuma diária programada" |
-| ⚠️ **Erro de conexão** | Tela de erro com a causa e o botão **TENTAR NOVAMENTE**; gravações falham **sem corromper** os dados salvos |
-| 🐢 **Resposta lenta** | Indicadores de carregamento ficam visíveis por ~2,5 s |
-
-O cenário fica persistido em `AsyncStorage`, e "Restaurar dados de demonstração" devolve
-trechos, agenda, notificações e cenário ao estado original do mock — útil para repetir a
-demonstração do zero.
-
-### Novos mocks
-
-| Arquivo | Conteúdo |
-|---|---|
-| `agendaMock.js` | Escala de 15 a 19 de junho de 2026 com 4 status diferentes, 3 turnos e 5 motivos de ausência |
-| `notificacoesMock.js` | 5 notificações de 4 tipos, com lidas e não lidas, ligadas aos trechos |
-| `usuarioMock.js` | Operador (nome, cargo, matrícula, equipe, regional) e conta de demonstração |
-| `mockScenarios.js` | Definição dos 4 cenários e do erro simulado (`MockApiError`) |
-
-As datas de todos os mocks foram alinhadas à mesma semana de referência, para que agenda,
-notificações e histórico de inspeções contem uma história coerente.
-
-## 4. Consistência visual — componentes reutilizáveis
-
-A interface da Sprint 2 repetia estilos dentro de cada tela (cada uma tinha seu próprio card,
-botão, input e selo). A Sprint 3 extraiu esses padrões para `src/components/`:
-
-| Componente | Usado em |
-|---|---|
-| `ScreenHeader` | Trechos, Detalhe, Notificações, Agenda, Registrar Poda, Perfil |
-| `Card` | Dashboard, Detalhe, Registrar Poda, Perfil |
-| `PrimaryButton` | Todas as telas com ação (3 variantes + estado de carregamento) |
-| `FormInput` | Registro, Login, Detalhe, Registrar Poda |
-| `StateView` | Todas as listas (carregando / erro / vazio) |
-| `InlineMessage` | Todos os formulários (sucesso / erro / info) |
-| `StatusBadge` | Trechos, Notificações, Agenda |
-| `FilterChips` | Trechos |
-| `OptionRow` | Registrar Poda, Perfil |
-
-Os valores de status também foram centralizados: `constants/statusVegetacao.js` passou a ser a
-única fonte de emoji, cor e gravidade — antes essa tabela estava duplicada em duas telas.
-
----
-
-# 📊 Status de cada funcionalidade
-
-| # | Funcionalidade | Status | Observação |
-|---|---|---|---|
-| 1 | Cadastro de usuário | ✅ Completo | Valida email, senha e duplicidade de conta |
-| 2 | Login e persistência de sessão | ✅ Completo | Credenciais mockadas; recusa senha incorreta |
-| 3 | Logout | ✅ Completo | Disponível no Dashboard e no Perfil; reseta a pilha |
-| 4 | Dashboard operacional | ✅ Completo | Todos os cards com destino definido |
-| 5 | Notificações | ✅ Completo | Leitura individual, em massa e badge no Dashboard |
-| 6 | Agenda da semana | ✅ Completo | 4 status de diária e atalho para o trecho |
-| 7 | Confirmar poda do dia | ✅ Completo | Turno + observação; reflete na agenda |
-| 8 | Informar ausência (fluxo alternativo) | ✅ Completo | Motivo + justificativa; detecta conflito |
-| 9 | Lista de trechos | ✅ Completo | Ordenação por IA, filtros e pull-to-refresh |
-| 10 | GPS e trecho mais próximo | ✅ Completo | Trata permissão negada sem quebrar a tela |
-| 11 | Previsão de IA por trecho | ⚠️ Mockado | Nível, confiança e motivo vêm do mock, não de um modelo |
-| 12 | Registro de inspeção | ✅ Completo | Valida campos e atualiza status, histórico e lista |
-| 13 | Feedback do podador sobre a IA | ⚠️ Parcial | É gravado, mas ainda não há tela que consolide o acerto do modelo |
-| 14 | Perfil do operador | ✅ Completo | Somente leitura — edição não faz parte do escopo |
-| 15 | Estados de carregamento / erro / vazio | ✅ Completo | Presentes em todas as listas e formulários |
-| 16 | Modo de demonstração (cenários de mock) | ✅ Completo | Recurso de apoio; sai na versão de produção |
-| 17 | Integração com API real | ❌ Não iniciado | Fora do escopo das Sprints 1–3 |
-| 18 | Notificações push | ❌ Não iniciado | Hoje são apenas dados mockados na tela |
-
-**Legenda:** ✅ completo e navegável · ⚠️ funciona, com limitação conhecida · ❌ não iniciado
-
----
-
-# 🔧 Pendências identificadas
-
-Levantadas durante a execução dos [testes manuais](./TESTES_MANUAIS.md). Nenhuma delas
-impede o uso do protótipo — são limitações conscientes, listadas de forma honesta.
-
-| # | Pendência | Impacto | Prioridade |
-|---|---|---|---|
-| P1 | Autenticação simulada; senhas em texto puro no AsyncStorage | Não é seguro para uso real | Alta |
-| P2 | Sem API — dados não sincronizam entre aparelhos | Cada instalação tem seus próprios dados | Alta |
-| P3 | Previsão de IA é campo estático do mock | Não há inferência real | Alta |
-| P4 | Data de referência da agenda é fixa (16/06/2026) | Mantém o mock coerente, mas não acompanha o calendário | Média |
-| P5 | Sem recuperação de senha | Usuário que esquece a senha precisa recadastrar | Média |
-| P6 | Feedback da IA gravado mas não consolidado em nenhuma tela | O ciclo de avaliação do modelo fica incompleto | Média |
-| P7 | Sem fila de sincronização offline | Registro feito sem rede não é reenviado | Média |
-| P8 | Inspeção aceita apenas texto, sem foto | Reduz a evidência de campo | Média |
-| P9 | GPS calcula distância, mas não há mapa | Menor leitura espacial dos trechos | Baixa |
-| P10 | "Modo de demonstração" visível no app | Precisa virar flag de build na versão final | Baixa |
-| P11 | Acessibilidade não revisada (contraste / leitor de tela) | Limita usuários com deficiência | Baixa |
-| P12 | Sem testes end-to-end | A cobertura é de unidade e componente | Baixa |
-
----
-
-# 🗺️ Plano de ajustes para a Sprint 4
-
-| Ordem | Ajuste planejado | Pendência que resolve | Entrega esperada |
-|---|---|---|---|
-| 1 | Substituir a camada de mock por um cliente HTTP real, mantendo a mesma interface dos services | P2 | Services consumindo API sem alterar as telas |
-| 2 | Autenticação real com token e senha protegida | P1 | Login/cadastro contra o backend |
-| 3 | Tela de desempenho da IA consolidando os feedbacks dos podadores | P3, P6 | Percentual de acerto do modelo por trecho e por período |
-| 4 | Agenda ligada à data real do dispositivo | P4 | "Hoje" acompanha o calendário |
-| 5 | Anexo de foto no registro de inspeção | P8 | Evidência visual junto da observação |
-| 6 | Fila de sincronização offline | P7 | Registros feitos sem rede reenviados ao reconectar |
-| 7 | Recuperação de senha | P5 | Fluxo "Esqueci minha senha" |
-| 8 | Remover o "Modo de demonstração" da build de produção | P10 | Recurso ativo apenas em build de desenvolvimento |
-| 9 | Revisão de acessibilidade e mapa dos trechos | P9, P11 | Contraste revisado e visualização em mapa |
-| 10 | Testes end-to-end dos 5 fluxos principais | P12 | Suíte E2E rodando junto dos testes de unidade |
-
-> A ordem prioriza o que destrava a integração real (itens 1 e 2), porque todos os demais
-> ajustes dependem de os dados deixarem de ser locais.
-
----
-
-# 👥 Integrantes
+## 👥 16. Integrantes
 
 | Nome | RM |
 |---|---|
@@ -721,15 +398,4 @@ impede o uso do protótipo — são limitações conscientes, listadas de forma 
 
 ---
 
-# 📌 Status do Projeto
-
-✅ **Sprint 1 concluída** — autenticação (cadastro, login, sessão) e dashboard
-✅ **Sprint 2 concluída** — trechos da rodovia, GPS, mock de dados, previsão de IA e feedback do podador
-✅ **Sprint 3 concluída** — protótipo funcional completo: 9 telas navegáveis, 4 cenários de mock,
-componentes reutilizáveis, 179 testes automatizados e [documento de testes manuais](./TESTES_MANUAIS.md)
-🚧 **Sprint 4** — integração com API real, conforme o plano de ajustes acima
-
-| Sprint | Telas | Testes automatizados |
-|---|---|---|
-| Sprint 2 | 5 | 87 |
-| **Sprint 3** | **9** | **179** |
+✅ Sprint 1 · ✅ Sprint 2 · ✅ Sprint 3 · ✅ **Sprint 4 — versão final, APK e plano de negócio**

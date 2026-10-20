@@ -1,13 +1,14 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   ATIVIDADES_DIA,
-  ITENS_SEMANA,
-  RESUMO_SEMANA,
-  AGENDA_SEMANA,
-  DATA_REFERENCIA,
   TURNOS_DISPONIVEIS,
   MOTIVOS_AUSENCIA,
+  getDataReferencia,
+  montarAgendaSemana,
+  montarItensSemana,
+  montarResumoSemana,
 } from '../mocks/agendaMock';
+import { toISODateTime, Relogio } from '../utils/datas';
 import MockScenarioService from './MockScenarioService';
 
 const AGENDA_KEY = '@prognosisherba:agenda';
@@ -47,9 +48,15 @@ function aplicarRegistro(dia, registro) {
   };
 }
 
+function agoraFormatado() {
+  return toISODateTime(Relogio.agora());
+}
+
 const AgendaService = {
+  // Datas da semana corrente — recalculadas a cada chamada para acompanhar
+  // o relógio do aparelho (o app pode ficar aberto de um dia para o outro).
   getDataReferencia() {
-    return DATA_REFERENCIA;
+    return getDataReferencia();
   },
 
   getAtividadesDia() {
@@ -57,11 +64,11 @@ const AgendaService = {
   },
 
   getItensSemana() {
-    return ITENS_SEMANA;
+    return montarItensSemana(montarAgendaSemana());
   },
 
   getResumoSemana() {
-    return RESUMO_SEMANA;
+    return montarResumoSemana(montarAgendaSemana());
   },
 
   getTurnos() {
@@ -74,16 +81,16 @@ const AgendaService = {
 
   async getAgendaSemana() {
     const registros = await lerRegistros();
-    const semana = AGENDA_SEMANA.map((dia) => aplicarRegistro(dia, registros[dia.data]));
+    const semana = montarAgendaSemana().map((dia) => aplicarRegistro(dia, registros[dia.data]));
     return MockScenarioService.aplicar(semana, { vazio: [] });
   },
 
-  async getRegistroDoDia(data = DATA_REFERENCIA.hoje) {
+  async getRegistroDoDia(data = getDataReferencia().hoje) {
     const registros = await lerRegistros();
     return registros[data] || null;
   },
 
-  async confirmarPoda({ data = DATA_REFERENCIA.hoje, turnoId, observacao = '' }) {
+  async confirmarPoda({ data = getDataReferencia().hoje, turnoId, observacao = '' }) {
     const turno = TURNOS_DISPONIVEIS.find((item) => item.id === turnoId);
     const registro = {
       tipo: 'poda',
@@ -92,7 +99,7 @@ const AgendaService = {
       turnoLabel: turno?.label || '',
       turnoHorario: turno?.horario || '',
       observacao: observacao.trim(),
-      registradoEm: new Date().toISOString().slice(0, 16).replace('T', ' '),
+      registradoEm: agoraFormatado(),
     };
 
     await MockScenarioService.aplicarEscrita(registro);
@@ -101,7 +108,7 @@ const AgendaService = {
     return registro;
   },
 
-  async registrarAusencia({ data = DATA_REFERENCIA.hoje, motivoId, justificativa = '' }) {
+  async registrarAusencia({ data = getDataReferencia().hoje, motivoId, justificativa = '' }) {
     const motivo = MOTIVOS_AUSENCIA.find((item) => item.id === motivoId);
     const registro = {
       tipo: 'ausencia',
@@ -109,7 +116,7 @@ const AgendaService = {
       motivoId,
       motivoLabel: motivo?.label || 'Motivo não informado',
       justificativa: justificativa.trim(),
-      registradoEm: new Date().toISOString().slice(0, 16).replace('T', ' '),
+      registradoEm: agoraFormatado(),
     };
 
     await MockScenarioService.aplicarEscrita(registro);

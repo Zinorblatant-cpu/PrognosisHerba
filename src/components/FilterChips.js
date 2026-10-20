@@ -16,6 +16,7 @@ export default function FilterChips({ options, value, onChange, testIDPrefix = '
             activeOpacity={0.8}
             accessibilityRole="button"
             accessibilityState={{ selected: ativo }}
+            accessibilityLabel={'Filtrar: ' + option.label}
             style={[styles.chip, ativo && styles.chipAtivo]}
           >
             <Text style={[styles.label, ativo && styles.labelAtivo]}>{option.label}</Text>

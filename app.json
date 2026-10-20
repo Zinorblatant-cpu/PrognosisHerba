@@ -5,22 +5,33 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "dark",
     "newArchEnabled": true,
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#000000"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.prognosisherba.app"
     },
     "android": {
+      "package": "com.prognosisherba.app",
+      "versionCode": 1,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#000000"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "CAMERA"
+      ],
+      "blockedPermissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -30,6 +41,14 @@
         "expo-location",
         {
           "locationWhenInUsePermission": "O PrognosisHerba usa sua localização para identificar o trecho da rodovia mais próximo durante o registro de inspeções de poda."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "O PrognosisHerba acessa suas fotos para anexar evidências às inspeções de vegetação.",
+          "cameraPermission": "O PrognosisHerba usa a câmera para fotografar a vegetação durante as inspeções de campo.",
+          "microphonePermission": false
         }
       ]
     ]

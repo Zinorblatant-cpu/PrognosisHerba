@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { colors } from '../theme/colors';
@@ -15,6 +16,9 @@ import TrechosService from '../services/TrechosService';
 import NotificacoesService from '../services/NotificacoesService';
 import MockScenarioService from '../services/MockScenarioService';
 import { CENARIOS_INFO, CENARIO_PADRAO } from '../mocks/mockScenarios';
+import { MODO_DEMO_PADRAO, TOQUES_PARA_LIBERAR_DEMO, VERSAO_APP, NOME_VERSAO } from '../config/app';
+
+const MODO_DEMO_KEY = '@prognosisherba:modoDemoLiberado';
 
 function Linha({ rotulo, valor, testID }) {
   return (
@@ -32,17 +36,22 @@ export default function PerfilScreen() {
   const [perfil, setPerfil] = useState(null);
   const [cenario, setCenario] = useState(CENARIO_PADRAO);
   const [mensagem, setMensagem] = useState(null);
+  const [modoDemo, setModoDemo] = useState(MODO_DEMO_PADRAO);
+  const [toques, setToques] = useState(0);
 
   useEffect(() => {
     let ativo = true;
 
-    Promise.all([AuthService.getPerfil(), MockScenarioService.getCenario()]).then(
-      ([dadosPerfil, cenarioAtual]) => {
-        if (!ativo) return;
-        setPerfil(dadosPerfil);
-        setCenario(cenarioAtual);
-      }
-    );
+    Promise.all([
+      AuthService.getPerfil(),
+      MockScenarioService.getCenario(),
+      AsyncStorage.getItem(MODO_DEMO_KEY).catch(() => null),
+    ]).then(([dadosPerfil, cenarioAtual, liberado]) => {
+      if (!ativo) return;
+      setPerfil(dadosPerfil);
+      setCenario(cenarioAtual);
+      if (liberado === 'true') setModoDemo(true);
+    });
 
     return () => {
       ativo = false;
@@ -69,6 +78,27 @@ export default function PerfilScreen() {
       type: 'success',
       text: 'Dados de demonstração restaurados ao estado original do mock.',
     });
+  }
+
+  // Toques na versão do app liberam o modo de demonstração na build de release.
+  async function tocarVersao() {
+    if (modoDemo) return;
+    const total = toques + 1;
+    setToques(total);
+    if (total >= TOQUES_PARA_LIBERAR_DEMO) {
+      setModoDemo(true);
+      await AsyncStorage.setItem(MODO_DEMO_KEY, 'true');
+      setMensagem({ type: 'info', text: 'Modo de demonstração liberado neste aparelho.' });
+    }
+  }
+
+  async function ocultarModoDemo() {
+    await MockScenarioService.setCenario(CENARIO_PADRAO);
+    await AsyncStorage.removeItem(MODO_DEMO_KEY);
+    setCenario(CENARIO_PADRAO);
+    setModoDemo(MODO_DEMO_PADRAO);
+    setToques(0);
+    setMensagem(null);
   }
 
   async function sair() {
@@ -120,40 +150,59 @@ export default function PerfilScreen() {
           </View>
         </Card>
 
-        <Card
-          title="Modo de demonstração"
-          subtitle="Simula as respostas da API enquanto a integração real não existe"
-        >
-          <View style={styles.bloco}>
-            {CENARIOS_INFO.map((item) => (
-              <OptionRow
-                key={item.id}
-                testID={'cenario-' + item.id}
-                title={item.emoji + '  ' + item.titulo}
-                description={item.descricao}
-                selected={cenario === item.id}
-                onPress={() => trocarCenario(item.id)}
+        {modoDemo ? (
+          <Card
+            testID="modo-demo-card"
+            title="Modo de demonstração"
+            subtitle="Simula as respostas da API enquanto a integração real não existe"
+          >
+            <View style={styles.bloco}>
+              {CENARIOS_INFO.map((item) => (
+                <OptionRow
+                  key={item.id}
+                  testID={'cenario-' + item.id}
+                  title={item.emoji + '  ' + item.titulo}
+                  description={item.descricao}
+                  selected={cenario === item.id}
+                  onPress={() => trocarCenario(item.id)}
+                />
+              ))}
+
+              {mensagem ? <InlineMessage testID="perfil-mensagem" {...mensagem} /> : null}
+
+              <PrimaryButton
+                testID="restaurar-dados-button"
+                label="RESTAURAR DADOS DE DEMONSTRAÇÃO"
+                variant="secondary"
+                onPress={restaurarDados}
+                style={styles.restaurar}
               />
-            ))}
+              {!MODO_DEMO_PADRAO ? (
+                <PrimaryButton
+                  testID="ocultar-demo-button"
+                  label="OCULTAR MODO DE DEMONSTRAÇÃO"
+                  variant="secondary"
+                  onPress={ocultarModoDemo}
+                  style={styles.restaurar}
+                />
+              ) : null}
+            </View>
+          </Card>
+        ) : mensagem ? (
+          <InlineMessage testID="perfil-mensagem" {...mensagem} />
+        ) : null}
 
-            {mensagem ? <InlineMessage testID="perfil-mensagem" {...mensagem} /> : null}
+        <PrimaryButton testID="perfil-logout-button" label="SAIR DA CONTA" variant="danger" onPress={sair} />
 
-            <PrimaryButton
-              testID="restaurar-dados-button"
-              label="RESTAURAR DADOS DE DEMONSTRAÇÃO"
-              variant="secondary"
-              onPress={restaurarDados}
-              style={styles.restaurar}
-            />
-          </View>
-        </Card>
-
-        <PrimaryButton
-          testID="perfil-logout-button"
-          label="SAIR DA CONTA"
-          variant="danger"
-          onPress={sair}
-        />
+        <TouchableOpacity
+          testID="versao-app"
+          onPress={tocarVersao}
+          activeOpacity={0.9}
+          accessibilityRole="text"
+          accessibilityLabel={'Versão ' + VERSAO_APP}
+        >
+          <Text style={styles.versao}>{'PrognosisHerba v' + VERSAO_APP + ' • ' + NOME_VERSAO}</Text>
+        </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   );
@@ -225,5 +274,12 @@ const styles = StyleSheet.create({
   },
   restaurar: {
     marginTop: 14,
+  },
+  versao: {
+    color: colors.textMuted,
+    fontSize: 11,
+    textAlign: 'center',
+    marginTop: 20,
+    paddingVertical: 8,
   },
 });

@@ -11,7 +11,6 @@ import PrimaryButton from '../components/PrimaryButton';
 import InlineMessage from '../components/InlineMessage';
 import StateView from '../components/StateView';
 import AgendaService from '../services/AgendaService';
-import { DATA_REFERENCIA } from '../mocks/agendaMock';
 
 // Tela única para os dois cards de "Atividades do Dia" do Dashboard:
 //   tipo = 'poda'     → confirma o turno da poda do dia
@@ -32,11 +31,13 @@ export default function RegistrarPodaScreen() {
   const turnos = AgendaService.getTurnos();
   const motivos = AgendaService.getMotivosAusencia();
   const opcoes = ehAusencia ? motivos : turnos;
+  // Dia operacional (hoje, ou a próxima segunda quando aberto no fim de semana).
+  const referencia = AgendaService.getDataReferencia() || {};
 
   useEffect(() => {
     let ativo = true;
 
-    AgendaService.getRegistroDoDia(DATA_REFERENCIA.hoje)
+    AgendaService.getRegistroDoDia(referencia.hoje)
       .then((registro) => {
         if (!ativo) return;
         setRegistroExistente(registro);
@@ -92,7 +93,9 @@ export default function RegistrarPodaScreen() {
         setRegistroExistente(registro);
         setMensagem({
           type: 'success',
-          text: 'Poda confirmada para hoje. A agenda do dia foi atualizada.',
+          text: referencia.foraDoExpediente
+            ? 'Poda confirmada para a próxima diária. A agenda foi atualizada.'
+            : 'Poda confirmada para hoje. A agenda do dia foi atualizada.',
         });
       }
     } catch (e) {
@@ -110,7 +113,7 @@ export default function RegistrarPodaScreen() {
       <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
         <ScreenHeader
           title={ehAusencia ? 'Informar Ausência' : 'Confirmar Poda'}
-          subtitle={DATA_REFERENCIA.diaExtenso}
+          subtitle={referencia.diaExtenso}
           onBack={() => navigation.goBack()}
         />
 

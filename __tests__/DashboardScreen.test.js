@@ -106,14 +106,14 @@ describe('DashboardScreen', () => {
     expect(getByText('horário de início')).toBeTruthy();
   });
 
-  it('renders 3 dias de poda count', () => {
+  it('renders 4 dias de poda count (5 dias úteis menos a ausência)', () => {
     const { getByTestId } = render(<DashboardScreen />);
-    expect(getByTestId('stat-dias').props.children).toBe('3');
+    expect(getByTestId('stat-dias').props.children).toBe('4');
   });
 
-  it('renders 5 locais count', () => {
+  it('renders 4 locais count', () => {
     const { getByTestId } = render(<DashboardScreen />);
-    expect(getByTestId('stat-locais').props.children).toBe('5');
+    expect(getByTestId('stat-locais').props.children).toBe('4');
   });
 
   it('renders 09:00 horario de inicio', () => {
@@ -159,5 +159,11 @@ describe('DashboardScreen', () => {
       // devolva o usuario ao Dashboard depois do logout.
       expect(mockReset).toHaveBeenCalledWith({ index: 0, routes: [{ name: 'Register' }] });
     });
+  });
+
+  it('card "Desempenho da IA" abre a tela de desempenho (Sprint 4)', () => {
+    const { getByTestId } = render(<DashboardScreen />);
+    fireEvent.press(getByTestId('ver-desempenho-ia'));
+    expect(mockNavigate).toHaveBeenCalledWith('DesempenhoIA');
   });
 });

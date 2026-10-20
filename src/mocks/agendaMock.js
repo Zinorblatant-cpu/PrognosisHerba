@@ -1,14 +1,23 @@
-// Agenda operacional do podador. Semana de referência: 15 a 19 de junho de 2026,
-// coerente com as datas de última inspeção usadas em trechosMock.js.
+// Agenda operacional do podador.
+//
+// Sprint 4: a escala deixou de ter datas fixas. A semana é montada a partir do
+// relógio do aparelho (segunda a sexta do dia operacional), então "hoje" na
+// agenda e no Dashboard sempre acompanha o calendário real.
 
-export const DATA_REFERENCIA = {
-  hoje: '2026-06-16',
-  diaExtenso: 'Terça-feira, 16 de junho',
-  intervaloSemana: '15 a 19 de junho',
-};
+import {
+  hoje as hojeReal,
+  toISODate,
+  nomeDiaSemana,
+  formatarDiaMes,
+  formatarDiaExtenso,
+  formatarIntervalo,
+  getDiaOperacional,
+  getSemanaOperacional,
+  ehFimDeSemana,
+} from '../utils/datas';
 
-// Cards de "Atividades do Dia" no Dashboard. `rota`/`params` definem para onde
-// cada card navega — nenhum card do dashboard fica sem destino.
+// Cards de "Atividades do Dia" no Dashboard. Cada card abre a RegistrarPodaScreen
+// no modo indicado por `tipo` — nenhum card do dashboard fica sem destino.
 export const ATIVIDADES_DIA = [
   {
     id: 'poda',
@@ -28,95 +37,144 @@ export const ATIVIDADES_DIA = [
   },
 ];
 
-// Itens de "Atividades da Semana" no Dashboard.
-export const ITENS_SEMANA = [
-  { id: 'days', icon: '📅', label: 'Poda em quantos dias', value: '3 dias programados' },
-  { id: 'local', icon: '📍', label: 'Local da poda', value: '3 trechos definidos' },
-  { id: 'hora', icon: '🕐', label: 'Hora da poda', value: '09:00h - 17:00h' },
-];
-
-// Números do "Resumo da semana". Mantidos como string porque são exibidos
-// diretamente, sem formatação adicional.
-export const RESUMO_SEMANA = {
-  dias: '3',
-  locais: '5',
-  horarioInicio: '09:00',
-};
-
-// Calendário da semana usado pela tela Agenda. `status` cobre os três estados
-// de uma diária: já executada, programada e ausência justificada.
-export const AGENDA_SEMANA = [
-  {
-    id: '2026-06-15',
-    data: '2026-06-15',
-    diaSemana: 'Segunda-feira',
-    diaLabel: '15 de junho',
-    turno: '09:00 - 17:00',
-    equipe: 'Equipe Alfa',
-    status: 'Concluída',
-    trechoId: 'trecho-3',
-    trecho: 'Trecho Itu - Pista Marginal',
-    rodovia: 'Rodovia Castello Branco (SP-280)',
-    descricao: 'Poda de manutenção na faixa de domínio, conforme cronograma ARTESP.',
-  },
-  {
-    id: '2026-06-16',
-    data: '2026-06-16',
-    diaSemana: 'Terça-feira',
-    diaLabel: '16 de junho',
-    turno: '09:00 - 17:00',
-    equipe: 'Equipe Alfa',
-    status: 'Programada',
-    trechoId: 'trecho-1',
+// Serviço previsto para cada trecho quando ele entra na escala.
+const SERVICO_POR_TRECHO = {
+  'trecho-1': {
     trecho: 'Trecho Jundiaí - Acesso Norte',
     rodovia: 'Rodovia Anhanguera (SP-330)',
     descricao: 'Poda emergencial — vegetação cobrindo placa de sinalização no km 80.',
   },
-  {
-    id: '2026-06-17',
-    data: '2026-06-17',
-    diaSemana: 'Quarta-feira',
-    diaLabel: '17 de junho',
-    turno: '09:00 - 17:00',
-    equipe: 'Equipe Alfa',
-    status: 'Programada',
-    trechoId: 'trecho-4',
-    trecho: 'Trecho Cotia - Entroncamento',
-    rodovia: 'Rodovia Raposo Tavares (SP-270)',
-    descricao: 'Liberação de visibilidade na curva do km 35.',
-  },
-  {
-    id: '2026-06-18',
-    data: '2026-06-18',
-    diaSemana: 'Quinta-feira',
-    diaLabel: '18 de junho',
-    turno: '—',
-    equipe: 'Equipe Alfa',
-    status: 'Ausência justificada',
-    trechoId: null,
-    trecho: 'Sem trecho alocado',
-    rodovia: 'Consulta médica registrada pelo operador',
-    descricao: 'Ausência informada pelo próprio operador no app, já aprovada pela supervisão.',
-  },
-  {
-    id: '2026-06-19',
-    data: '2026-06-19',
-    diaSemana: 'Sexta-feira',
-    diaLabel: '19 de junho',
-    turno: '09:00 - 13:00',
-    equipe: 'Equipe Alfa',
-    status: 'Programada',
-    trechoId: 'trecho-2',
+  'trecho-2': {
     trecho: 'Trecho Várzea Paulista',
     rodovia: 'Rodovia dos Bandeirantes (SP-348)',
     descricao: 'Roçada preventiva no limite da faixa de domínio.',
   },
-];
+  'trecho-3': {
+    trecho: 'Trecho Itu - Pista Marginal',
+    rodovia: 'Rodovia Castello Branco (SP-280)',
+    descricao: 'Poda de manutenção na faixa de domínio, conforme cronograma ARTESP.',
+  },
+  'trecho-4': {
+    trecho: 'Trecho Cotia - Entroncamento',
+    rodovia: 'Rodovia Raposo Tavares (SP-270)',
+    descricao: 'Liberação de visibilidade na curva do km 35.',
+  },
+  'trecho-5': {
+    trecho: 'Trecho Oeste - Barueri',
+    rodovia: 'Rodoanel Mário Covas (SP-021)',
+    descricao: 'Roçada de rotina e limpeza de dispositivos de drenagem.',
+  },
+};
+
+// O trecho do dia é sempre o mais urgente (Jundiaí). Dias já passados usam
+// trechos recém-podados; dias futuros, os que estão na fila de prioridade.
+const TRECHO_DO_DIA = 'trecho-1';
+const FILA_PASSADO = ['trecho-3', 'trecho-5', 'trecho-2', 'trecho-4'];
+const FILA_FUTURO = ['trecho-4', 'trecho-2', 'trecho-5', 'trecho-3'];
+
+export const EQUIPE_PADRAO = 'Equipe Alfa';
+
+// Datas de referência da semana corrente, calculadas a partir de `base`.
+export function getDataReferencia(base = hojeReal()) {
+  const operacional = getDiaOperacional(base);
+  const semana = getSemanaOperacional(base);
+  const foraDoExpediente = ehFimDeSemana(base);
+
+  return {
+    hoje: toISODate(operacional),
+    diaExtenso: foraDoExpediente
+      ? 'Próxima diária: ' + formatarDiaExtenso(operacional)
+      : formatarDiaExtenso(operacional),
+    intervaloSemana: formatarIntervalo(semana[0], semana[4]),
+    foraDoExpediente,
+  };
+}
+
+// Escala de segunda a sexta. `status` cobre os estados de uma diária:
+// executada, programada e ausência justificada (registrada antecipadamente).
+export function montarAgendaSemana(base = hojeReal()) {
+  const semana = getSemanaOperacional(base);
+  const hojeISO = toISODate(getDiaOperacional(base));
+  const indiceHoje = semana.findIndex((dia) => toISODate(dia) === hojeISO);
+  // A ausência pré-aprovada cai dois dias úteis depois de hoje (nunca no
+  // próprio dia), para não conflitar com a confirmação de poda do Dashboard.
+  const indiceAusencia = (indiceHoje + 2) % 5;
+
+  const passado = [...FILA_PASSADO];
+  const futuro = [...FILA_FUTURO];
+
+  return semana.map((data, indice) => {
+    const iso = toISODate(data);
+    const base = {
+      id: iso,
+      data: iso,
+      diaSemana: nomeDiaSemana(data),
+      diaLabel: formatarDiaMes(data),
+      equipe: EQUIPE_PADRAO,
+    };
+
+    if (indice === indiceAusencia) {
+      return {
+        ...base,
+        turno: '—',
+        status: 'Ausência justificada',
+        trechoId: null,
+        trecho: 'Sem trecho alocado',
+        rodovia: 'Consulta médica registrada pelo operador',
+        descricao: 'Ausência informada pelo próprio operador no app, já aprovada pela supervisão.',
+      };
+    }
+
+    let trechoId;
+    let status;
+    if (indice === indiceHoje) {
+      trechoId = TRECHO_DO_DIA;
+      status = 'Programada';
+    } else if (indice < indiceHoje) {
+      trechoId = passado.shift();
+      status = 'Concluída';
+    } else {
+      trechoId = futuro.shift();
+      status = 'Programada';
+    }
+
+    return {
+      ...base,
+      ...SERVICO_POR_TRECHO[trechoId],
+      trechoId,
+      status,
+      turno: indice === 4 ? '09:00 - 13:00' : '09:00 - 17:00',
+    };
+  });
+}
+
+// Itens de "Atividades da Semana" no Dashboard, derivados da escala.
+export function montarItensSemana(semana) {
+  const diasDePoda = semana.filter((dia) => dia.trechoId).length;
+  const trechos = new Set(semana.filter((dia) => dia.trechoId).map((dia) => dia.trechoId));
+
+  return [
+    { id: 'days', icon: '📅', label: 'Poda em quantos dias', value: diasDePoda + ' dias programados' },
+    { id: 'local', icon: '📍', label: 'Local da poda', value: trechos.size + ' trechos definidos' },
+    { id: 'hora', icon: '🕐', label: 'Hora da poda', value: '09:00h - 17:00h' },
+  ];
+}
+
+// Números do "Resumo da semana". Strings porque são exibidos diretamente.
+export function montarResumoSemana(semana) {
+  const diasDePoda = semana.filter((dia) => dia.trechoId).length;
+  const trechos = new Set(semana.filter((dia) => dia.trechoId).map((dia) => dia.trechoId));
+  return {
+    dias: String(diasDePoda),
+    locais: String(trechos.size),
+    horarioInicio: '09:00',
+  };
+}
 
 export const AGENDA_STATUS_INFO = {
-  'Concluída': { emoji: '✅', color: '#1A3300' },
-  'Confirmada': { emoji: '✂️', color: '#1A3300' },
-  'Programada': { emoji: '🗓️', color: '#00294D' },
+  Concluída: { emoji: '✅', color: '#1A3300' },
+  Confirmada: { emoji: '✂️', color: '#1A3300' },
+  Programada: { emoji: '🗓️', color: '#00294D' },
   'Ausência justificada': { emoji: '🚫', color: '#330000' },
 };
 

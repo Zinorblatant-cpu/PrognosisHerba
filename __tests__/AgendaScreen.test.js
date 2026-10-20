@@ -49,6 +49,12 @@ describe('AgendaScreen', () => {
     mockNavigate.mockClear();
     mockGoBack.mockClear();
     AgendaService.getAgendaSemana.mockResolvedValue(SEMANA);
+    AgendaService.getDataReferencia.mockReturnValue({
+      hoje: '2026-06-16',
+      diaExtenso: 'Terça-feira, 16 de junho',
+      intervaloSemana: '15 a 19 de junho',
+      foraDoExpediente: false,
+    });
   });
 
   it('exibe o estado de carregamento antes da resposta', async () => {

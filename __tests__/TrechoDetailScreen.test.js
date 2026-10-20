@@ -14,6 +14,17 @@ jest.mock('@react-navigation/native', () => ({
 }));
 
 jest.mock('../src/services/TrechosService');
+jest.mock('../src/services/FotoService', () => ({
+  __esModule: true,
+  default: { tirarFoto: jest.fn(), escolherDaGaleria: jest.fn() },
+}));
+jest.mock('../src/services/LocationService', () => ({
+  __esModule: true,
+  default: { abrirNoMapa: jest.fn() },
+}));
+
+const FotoService = require('../src/services/FotoService').default;
+const LocationService = require('../src/services/LocationService').default;
 
 const TRECHO = {
   id: 'trecho-3',
@@ -139,5 +150,58 @@ describe('TrechoDetailScreen', () => {
     });
 
     expect(await findByText('Vegetação voltou a crescer na faixa lateral.')).toBeTruthy();
+  });
+
+  it('mostra os fatores que compõem a nota da previsão', async () => {
+    TrechosService.getTrechoById.mockResolvedValue({
+      ...TRECHO,
+      previsaoIA: {
+        ...TRECHO.previsaoIA,
+        score: 12,
+        fatores: [
+          { descricao: 'Última inspeção classificou o trecho como Conforme', pontos: 10 },
+          { descricao: 'Poda executada na última inspeção', pontos: -10 },
+        ],
+      },
+    });
+    const { findByTestId, getByText } = render(<TrechoDetailScreen />);
+    await findByTestId('previsao-ia-fatores');
+    expect(getByText(/12\/100/)).toBeTruthy();
+    expect(getByText('-10')).toBeTruthy();
+  });
+
+  it('anexa a foto da câmera à inspeção', async () => {
+    FotoService.tirarFoto.mockResolvedValue('file:///foto-campo.jpg');
+    const { findByTestId, getByTestId } = render(<TrechoDetailScreen />);
+
+    fireEvent.press(await findByTestId('foto-camera-button'));
+    await findByTestId('foto-preview');
+
+    fireEvent.press(getByTestId('status-option-atencao'));
+    fireEvent.changeText(getByTestId('observacao-input'), 'Com foto.');
+    fireEvent.press(getByTestId('registrar-inspecao-button'));
+
+    await waitFor(() => {
+      expect(TrechosService.registerInspecao).toHaveBeenCalledWith(
+        'trecho-3',
+        expect.objectContaining({ foto: 'file:///foto-campo.jpg' })
+      );
+    });
+  });
+
+  it('informa quando a permissão da câmera é negada', async () => {
+    FotoService.tirarFoto.mockRejectedValue(new Error('Permissão da câmera negada.'));
+    const { findByTestId } = render(<TrechoDetailScreen />);
+
+    fireEvent.press(await findByTestId('foto-camera-button'));
+    expect((await findByTestId('foto-mensagem')).props.children).toBe('Permissão da câmera negada.');
+  });
+
+  it('abre o trecho no app de mapas', async () => {
+    const { findByTestId } = render(<TrechoDetailScreen />);
+    fireEvent.press(await findByTestId('abrir-mapa-button'));
+    await waitFor(() => {
+      expect(LocationService.abrirNoMapa).toHaveBeenCalledWith(expect.objectContaining({ id: 'trecho-3' }));
+    });
   });
 });

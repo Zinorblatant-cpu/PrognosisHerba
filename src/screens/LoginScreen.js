@@ -78,6 +78,15 @@ export default function LoginScreen() {
           error={errors.password}
         />
 
+        <TouchableOpacity
+          testID="esqueci-senha"
+          onPress={() => navigation.navigate('EsqueciSenha', { email: email.trim() })}
+          style={styles.esqueci}
+          accessibilityRole="button"
+        >
+          <Text style={styles.linkText}>Esqueci minha senha</Text>
+        </TouchableOpacity>
+
         <PrimaryButton
           testID="login-button"
           label="LOGAR"
@@ -126,7 +135,11 @@ const styles = StyleSheet.create({
     letterSpacing: 2,
   },
   button: {
-    marginTop: 24,
+    marginTop: 16,
+  },
+  esqueci: {
+    alignSelf: 'flex-end',
+    marginTop: 4,
   },
   linkArea: {
     marginTop: 20,

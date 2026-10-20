@@ -2,7 +2,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import NotificacoesService from '../src/services/NotificacoesService';
 import MockScenarioService from '../src/services/MockScenarioService';
 import { CENARIOS } from '../src/mocks/mockScenarios';
-import { NOTIFICACOES_MOCK } from '../src/mocks/notificacoesMock';
+import { gerarNotificacoesMock } from '../src/mocks/notificacoesMock';
+
+const NOTIFICACOES_MOCK = gerarNotificacoesMock();
 
 jest.mock('@react-native-async-storage/async-storage', () =>
   require('@react-native-async-storage/async-storage/jest/async-storage-mock')

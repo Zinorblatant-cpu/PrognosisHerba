@@ -80,6 +80,28 @@ describe('RegisterScreen', () => {
     });
   });
 
+  it('exige a confirmação de senha (Sprint 4)', async () => {
+    const { getByPlaceholderText, getByTestId, getByText } = render(<RegisterScreen />);
+    fireEvent.changeText(getByPlaceholderText('COLOQUE SEU EMAIL'), 'teste@email.com');
+    fireEvent.changeText(getByPlaceholderText('COLOQUE SUA SENHA'), 'senha123');
+    fireEvent.press(getByTestId('register-button'));
+    await waitFor(() => {
+      expect(getByText('Confirme sua senha')).toBeTruthy();
+    });
+    expect(mockNavigate).not.toHaveBeenCalled();
+  });
+
+  it('recusa senha com menos de 6 caracteres (Sprint 4)', async () => {
+    const { getByPlaceholderText, getByTestId, getByText } = render(<RegisterScreen />);
+    fireEvent.changeText(getByPlaceholderText('COLOQUE SEU EMAIL'), 'teste@email.com');
+    fireEvent.changeText(getByPlaceholderText('COLOQUE SUA SENHA'), '123');
+    fireEvent.changeText(getByPlaceholderText('CONFIRME SUA SENHA'), '123');
+    fireEvent.press(getByTestId('register-button'));
+    await waitFor(() => {
+      expect(getByText('A senha precisa ter pelo menos 6 caracteres')).toBeTruthy();
+    });
+  });
+
   it('navigates to Login screen on successful registration', async () => {
     const { getByPlaceholderText, getByTestId } = render(<RegisterScreen />);
     fireEvent.changeText(getByPlaceholderText('COLOQUE SEU EMAIL'), 'teste@email.com');
