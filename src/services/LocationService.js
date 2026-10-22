@@ -8,17 +8,32 @@ function toRad(deg) {
 }
 
 const LocationService = {
+  // Nunca lança erro: sem permissão, com o GPS desligado ou sem sinal, devolve
+  // null e a tela segue sem o destaque de "mais próximo". (Sprint 4: antes, o
+  // erro "Current location is unavailable" derrubava a lista de trechos.)
   async getCurrentPosition() {
-    const { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== 'granted') {
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        return null;
+      }
+
+      let position = null;
+      try {
+        position = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy?.Balanced });
+      } catch (e) {
+        // GPS desligado ou sem sinal: tenta a última posição conhecida.
+        position = Location.getLastKnownPositionAsync ? await Location.getLastKnownPositionAsync() : null;
+      }
+
+      if (!position?.coords) return null;
+      return {
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
+      };
+    } catch (e) {
       return null;
     }
-
-    const position = await Location.getCurrentPositionAsync();
-    return {
-      latitude: position.coords.latitude,
-      longitude: position.coords.longitude,
-    };
   },
 
   getDistanceKm(pointA, pointB) {

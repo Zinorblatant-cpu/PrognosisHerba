@@ -198,7 +198,7 @@ câmera) vêm de módulos oficiais do Expo, com as permissões declaradas no `ap
 ```bash
 npm install          # dependências
 npm start            # Expo (abra no Expo Go ou emulador)
-npm test             # 233 testes automatizados
+npm test             # 236 testes automatizados
 ```
 
 ### Gerar o APK (EAS Build)
@@ -249,7 +249,7 @@ O documento completo, com premissas e fontes, está em **[PLANO_DE_NEGOCIO.md](.
 | **1** | Base e autenticação | 3 | sem registro | Registro, login, sessão, dashboard, identidade visual, Figma |
 | **2** | Dados e recurso nativo | 5 | 87 | Trechos, mock de dados, **GPS**, previsão de IA (mock), inspeção, feedback |
 | **3** | Protótipo funcional completo | 9 | 179 | Notificações, agenda, poda e ausência, perfil, **cenários de mock**, componentes reutilizáveis, testes manuais |
-| **4** | **Versão final e negócio** | **11** | **233** | **APK**, previsão calculada, Desempenho da IA, **câmera**, mapa, recuperação de senha, hash de senha, agenda real, acessibilidade, **plano de negócio** |
+| **4** | **Versão final e negócio** | **11** | **236** | **APK**, previsão calculada, Desempenho da IA, **câmera**, mapa, recuperação de senha, hash de senha, agenda real, acessibilidade, **plano de negócio** |
 
 ## 11. Sprint 4: o que mudou
 
@@ -268,7 +268,7 @@ O documento completo, com premissas e fontes, está em **[PLANO_DE_NEGOCIO.md](.
 | P9 | Sem mapa | **Resolvido.** "Abrir no mapa" leva o trecho ao app de mapas do aparelho |
 | P10 | Modo de demonstração visível | **Resolvido.** Oculto na build de release, liberável com 5 toques |
 | P11 | Acessibilidade não revisada | **Resolvido (básico).** Rótulos e estados para leitor de tela em botões, cards, opções e campos. O cinza secundário passou de 4,8:1 para 6,1:1 de contraste |
-| P12 | Sem testes E2E | **Não resolvido.** A cobertura segue sendo de unidade e componente (233 testes) |
+| P12 | Sem testes E2E | **Não resolvido.** A cobertura segue sendo de unidade e componente (236 testes) |
 
 ### Defeitos encontrados e corrigidos nesta Sprint
 
@@ -278,6 +278,7 @@ O documento completo, com premissas e fontes, está em **[PLANO_DE_NEGOCIO.md](.
   as duas estavam preenchidas.
 - **Ícone e splash padrão do Expo:** o app instalado mostraria o ícone genérico do Expo. Agora o
   ícone, o ícone adaptativo e a splash usam a logo do PrognosisHerba.
+- **GPS desligado derrubava a lista de trechos:** com a localização do celular desligada, o app mostrava "Não foi possível carregar os trechos". Agora a falha de GPS só remove o destaque de trecho mais próximo, e a lista carrega normalmente.
 - **Técnico fixo nas inspeções:** toda inspeção era assinada por "João Silva". Agora usa o
   usuário logado.
 
@@ -286,7 +287,7 @@ O documento completo, com premissas e fontes, está em **[PLANO_DE_NEGOCIO.md](.
 Foram criadas as suítes `PrevisaoIAService`, `DesempenhoIAService`, `DesempenhoIAScreen`,
 `EsqueciSenhaScreen`, `PerfilModoDemo` e `sha256`, além de casos novos em `AuthService`,
 `AgendaService`, `TrechosService`, `TrechoDetailScreen`, `LocationService`, `RegisterScreen`,
-`LoginScreen` e `DashboardScreen`. **Total: 233 testes em 24 suítes**, todos passando. O bundle
+`LoginScreen` e `DashboardScreen`. **Total: 236 testes em 24 suítes**, todos passando. O bundle
 Android de produção também foi gerado com `npx expo export --platform android` sem erros.
 
 ## 12. Por que não migramos para Flutter
@@ -300,7 +301,7 @@ código Flutter a reaproveitar. Os motivos:
   Build, que era o entregável da Sprint 4.
 - A equipe domina JavaScript e React, o que permitiu usar as Sprints 3 e 4 para **ampliar o
   produto** em vez de reconstruí-lo.
-- A suíte de testes cresceu de 87 para 233 casos sem troca de ferramenta, servindo de rede de
+- A suíte de testes cresceu de 87 para 236 casos sem troca de ferramenta, servindo de rede de
   segurança em todas as refatorações.
 
 ## 13. Requisitos
@@ -385,7 +386,7 @@ PrognosisHerba/
 │   │                              # PrevisaoIA, DesempenhoIA, MockScenario
 │   ├── theme/colors.js
 │   └── utils/                     # datas.js (fuso local, semana operacional), sha256.js
-└── __tests__/                     # 24 suítes / 233 testes
+└── __tests__/                     # 24 suítes / 236 testes
 ```
 
 ## 16. Integrantes

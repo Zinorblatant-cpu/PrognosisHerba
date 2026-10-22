@@ -51,7 +51,8 @@ export default function TrechosScreen() {
 
     try {
       const trechosData = await TrechosService.getTrechos();
-      const position = await LocationService.getCurrentPosition();
+      // A localização é um extra: se falhar, a lista aparece do mesmo jeito.
+      const position = await LocationService.getCurrentPosition().catch(() => null);
 
       setTrechos(trechosData);
       setLocation(position);

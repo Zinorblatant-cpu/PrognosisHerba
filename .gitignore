@@ -47,3 +47,6 @@ yarn-error.*
 # Binários de build (o APK vai para o GitHub Releases, não para o repositório)
 *.apk
 *.aab
+
+# Material do vídeo de pitch (não versionar)
+video/

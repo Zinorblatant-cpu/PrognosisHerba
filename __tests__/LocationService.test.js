@@ -5,6 +5,8 @@ import LocationService from '../src/services/LocationService';
 jest.mock('expo-location', () => ({
   requestForegroundPermissionsAsync: jest.fn(),
   getCurrentPositionAsync: jest.fn(),
+  getLastKnownPositionAsync: jest.fn(),
+  Accuracy: { Balanced: 3 },
 }));
 
 describe('LocationService', () => {
@@ -22,6 +24,22 @@ describe('LocationService', () => {
       const position = await LocationService.getCurrentPosition();
 
       expect(position).toEqual({ latitude: -23.5, longitude: -46.6 });
+    });
+
+    it('com o GPS desligado usa a última posição conhecida (Sprint 4)', async () => {
+      Location.requestForegroundPermissionsAsync.mockResolvedValue({ status: 'granted' });
+      Location.getCurrentPositionAsync.mockRejectedValue(new Error('Current location is unavailable.'));
+      Location.getLastKnownPositionAsync.mockResolvedValue({ coords: { latitude: -23.1, longitude: -46.8 } });
+
+      expect(await LocationService.getCurrentPosition()).toEqual({ latitude: -23.1, longitude: -46.8 });
+    });
+
+    it('sem GPS e sem posição conhecida devolve null em vez de lançar erro (Sprint 4)', async () => {
+      Location.requestForegroundPermissionsAsync.mockResolvedValue({ status: 'granted' });
+      Location.getCurrentPositionAsync.mockRejectedValue(new Error('Current location is unavailable.'));
+      Location.getLastKnownPositionAsync.mockResolvedValue(null);
+
+      await expect(LocationService.getCurrentPosition()).resolves.toBeNull();
     });
 
     it('returns null when permission is denied', async () => {

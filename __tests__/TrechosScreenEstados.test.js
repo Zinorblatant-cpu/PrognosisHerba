@@ -108,4 +108,11 @@ describe('TrechosScreen — estados e filtros (Sprint 3)', () => {
 
     expect(queryByTestId('trecho-mais-proximo-trecho-1')).toBeNull();
   });
+
+  it('uma falha do GPS não impede a lista de aparecer (Sprint 4)', async () => {
+    LocationService.getCurrentPosition.mockRejectedValue(new Error('Current location is unavailable.'));
+    const { findByTestId, queryByTestId } = render(<TrechosScreen />);
+    expect(await findByTestId('trecho-item-trecho-1')).toBeTruthy();
+    expect(queryByTestId('trechos-erro')).toBeNull();
+  });
 });
